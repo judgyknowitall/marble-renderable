@@ -45,7 +45,7 @@ MyWindow::MyWindow(ObjFile* o) : obj(o) {
     
     // Callbacks
     glfwSetKeyCallback(mWindow, onKey);
-    glfwSetMouseButtonCallback(mWindow, onMouse);
+    glfwSetMouseButtonCallback(mWindow, onMouseClick);
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -91,8 +91,10 @@ void MyWindow::key_callback(int key, int scancode, int action, int mods)
 // Mouse Callback Function
 void MyWindow::mouse_callback(int button, int action, int mods)
 {
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
         obj->xform.scalar = 1.01f;
+        cout << "zooming in?" << endl;
+    }
     if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
         obj->xform.scalar = 1.0f;
 

@@ -94,10 +94,18 @@ void ObjFile::setupObj(GLuint vertexLocation, GLuint normalLocation) {
 
 
 void ObjFile::draw (GLuint vertexLocation, GLuint normalLocation) {
-	glBindBuffer (GL_ARRAY_BUFFER, vertexBuffer);
-	glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-  
-	glDrawElements(GL_TRIANGLES, indices.size() * 3, GL_UNSIGNED_INT, 0);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+	glEnableVertexAttribArray(vertexLocation);
+	glVertexAttribPointer(vertexLocation, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+	glEnableVertexAttribArray(normalLocation);
+	glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(vec4) * vertices.size()));
+
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+	//xform.rotation = rotate(mat4(1.0f), 0.01f, vec3(1.0f, 0.0f, 0.0f)) * xform.rotation;
 }
 
 int ObjFile::numVertices () {

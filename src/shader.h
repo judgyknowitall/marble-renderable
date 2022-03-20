@@ -24,8 +24,8 @@ private:
 	GLuint myShaderProgram;
 
 	// Shader filenames
-	std::string vsFilename = "shaders/per-fragment-phong.vs.glsl";
-	std::string fsFilename = "shaders/per-fragment-phong.fs.glsl";
+	std::string vsFilename = "shaders/phong.vs.glsl";
+	std::string fsFilename = "shaders/phong.fs.glsl";
 
 public:
 

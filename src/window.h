@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <iostream>
 
 #include "objFile.h"
 
@@ -36,7 +37,7 @@ private:
         w->key_callback(key, scancode, actions, mods);
     }
 
-    static void onMouse(GLFWwindow* window, int button, int action, int mods)
+    static void onMouseClick(GLFWwindow* window, int button, int action, int mods)
     {
         MyWindow* w = (MyWindow*) glfwGetWindowUserPointer(window);
         w->mouse_callback(button, action, mods);

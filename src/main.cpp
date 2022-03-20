@@ -73,6 +73,7 @@ void renderScene(GLuint myShaderProgram, ObjFile* obj) {
 
 int main(int argc, char **argv)
 {
+    // Setup object
     ObjFile* obj = new ObjFile("models/cube.obj");
 
     // Set up Graphics
@@ -84,9 +85,7 @@ int main(int argc, char **argv)
     // shaders, geometry etc., before entering the main loop.)
     shader->setupRenderingContext();
 
-    // Set up object
-    obj = new ObjFile("models/cube.obj");
-
+    // Finish setting up obj
     if (obj->numVertices() == 0) {
         cout << "Could not load file " << argv[1] << ".\n";
         exit(EXIT_FAILURE);
