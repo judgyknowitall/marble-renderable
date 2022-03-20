@@ -43,9 +43,8 @@ MyWindow::MyWindow(ObjFile* o) : obj(o) {
     }
     glfwMakeContextCurrent(mWindow);
     
-    // Callbacks
+    // Set up Key Callbacks
     glfwSetKeyCallback(mWindow, onKey);
-    glfwSetMouseButtonCallback(mWindow, onMouseClick);
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -73,35 +72,47 @@ MyWindow::MyWindow(ObjFile* o) : obj(o) {
 // Keyboard callback function.
 void MyWindow::key_callback(int key, int scancode, int action, int mods)
 {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(mWindow, GL_TRUE);
+    switch (key) {
 
-    if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT))
-        obj->xform.rotation = rotate(mat4(1.0f), 0.1f, vec3(1.0f, 0.0f, 0.0f)) * obj->xform.rotation;
-    if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT))
-        obj->xform.rotation = rotate(mat4(1.0f), 0.1f, vec3(-1.0f, 0.0f, 0.0f)) * obj->xform.rotation;
+        // Exit
+        case GLFW_KEY_ESCAPE:
+            if (action == GLFW_PRESS)
+                glfwSetWindowShouldClose(mWindow, GL_TRUE);
+            break;
 
-    if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT))
-        obj->xform.rotation = rotate(mat4(1.0f), 0.1f, vec3(0.0f, 1.0f, 0.0f)) * obj->xform.rotation;
-    if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT))
-        obj->xform.rotation = rotate(mat4(1.0f), 0.1f, vec3(0.0f, -1.0f, 0.0f)) * obj->xform.rotation;
-}
+        // Rotation
+        case GLFW_KEY_UP:
+            if (action == GLFW_PRESS || action == GLFW_REPEAT)
+                obj->xform.rotation = rotate(mat4(1.0f), 0.1f, vec3(1.0f, 0.0f, 0.0f)) * obj->xform.rotation;
+            break;
 
+        case GLFW_KEY_DOWN:
+            if (action == GLFW_PRESS || action == GLFW_REPEAT)
+                obj->xform.rotation = rotate(mat4(1.0f), 0.1f, vec3(-1.0f, 0.0f, 0.0f)) * obj->xform.rotation;
+            break;
 
-// Mouse Callback Function
-void MyWindow::mouse_callback(int button, int action, int mods)
-{
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-        obj->xform.scalar = 1.01f;
-        cout << "zooming in?" << endl;
+        case GLFW_KEY_RIGHT:
+            if (action == GLFW_PRESS || action == GLFW_REPEAT)
+                obj->xform.rotation = rotate(mat4(1.0f), 0.1f, vec3(0.0f, 1.0f, 0.0f)) * obj->xform.rotation;
+            break;
+
+        case GLFW_KEY_LEFT:
+            if (action == GLFW_PRESS || action == GLFW_REPEAT)
+                obj->xform.rotation = rotate(mat4(1.0f), 0.1f, vec3(0.0f, -1.0f, 0.0f)) * obj->xform.rotation;
+            break;
+
+        // Scale
+        case GLFW_KEY_Z:
+            if (action == GLFW_RELEASE) obj->xform.scalar = 1.0f; 
+            else obj->xform.scalar = 1.01f;
+            break;
+
+        case GLFW_KEY_X:
+            if (action == GLFW_RELEASE) obj->xform.scalar = 1.0f;
+            else obj->xform.scalar = 1.0f / 1.01f;
+            break;
     }
-    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
-        obj->xform.scalar = 1.0f;
-
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
-        obj->xform.scalar = 1.0f / 1.01f;
-    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
-        obj->xform.scalar = 1.0f;
 }
+
 
 

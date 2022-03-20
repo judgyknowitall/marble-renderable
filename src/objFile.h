@@ -35,6 +35,7 @@ class ObjFile {
 		ObjFile (string filename);
 		void loadObjFile(string filename);
 		void setupObj(GLuint vertexLocation, GLuint normalLocation);
+		void resetParams();
 
 		void draw (GLuint vertexLocation, GLuint normalLocation);
 
@@ -46,7 +47,7 @@ class ObjFile {
 		
 
 	private:
-		GLuint vertexBuffer, indexBuffer;
+		GLuint vertexBuffer = NULL, indexBuffer = NULL;
 		vector<vec4> vertices;
 		vector<vec3> normals;
 		vector<GLuint> indices;

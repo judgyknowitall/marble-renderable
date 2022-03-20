@@ -114,7 +114,7 @@ int main(int argc, char **argv)
         
         // Render objects to the scene
         renderScene(shader->getShaderProgram(), obj);
-        //ui.draw();
+        ui.draw();
         
         // Note that buffer swapping and polling for events is done here
         // so please don't do it in the function used to draw the scene.

@@ -18,35 +18,19 @@ using namespace glm;
 
 
 ObjFile::ObjFile (string filename) {
-
 	loadObjFile(filename);
-	
-	/*
-	vertices = {
-	 vec4(0.5f,  0.5f, 0.0f, 1.0f),  // top right
-	 vec4(0.5f, -0.5f, 0.0f, 1.0f),  // bottom right
-	vec4(-0.5f, -0.5f, 0.0f, 1.0f),  // bottom left
-	vec4(-0.5f,  0.5f, 0.0f, 1.0f)   // top left 
-	};
-	indices = {  // note that we start from 0!
-	ivec3(0, 1, 3),   // first triangle
-	ivec3(1, 2, 3)    //second triangle
-	};*/
-	//TODO
 }
 
 void ObjFile::loadObjFile(string filename) {
+
+	cout << "Loading Object: \"" << filename << "\"" << endl;
 
 	ifstream reader(filename);
 
 	if (reader.is_open()) {
 
 		// Reset parameters
-		vertices.clear();
-		normals.clear();
-		indices.clear();
-		max = {-100, -100, -100};
-		min = { 100, 100, 100 };
+		resetParams();
 
 		char c[256];
 		string str;
@@ -78,6 +62,12 @@ void ObjFile::loadObjFile(string filename) {
 			str = "";
 		}
 		reader.close();
+
+		cout << "MAX: " << max.x << " " << max.y << " " << max.z << endl;
+		cout << "MIN: " << min.x << " " << min.y << " " << min.z << endl;
+	}
+	else {
+		cerr << "File \"" << filename << "\" not found!" << endl;
 	}
 }
 
@@ -87,6 +77,23 @@ void ObjFile::setupObj(GLuint vertexLocation, GLuint normalLocation) {
 	bufferData(vertexLocation, normalLocation);
 	xform.scaling = getFitScale();
 	xform.translation = getFitTranslate();
+}
+
+
+void ObjFile::resetParams() {
+
+	// Vectors
+	vertices.clear();
+	normals.clear();
+	indices.clear();
+	max = { -100, -100, -100 };
+	min = { 100, 100, 100 };
+
+	// Transformations
+	xform.rotation = mat4(1.0f);
+	xform.scaling = mat4(1.0f);
+	xform.translation = mat4(1.0f);
+	xform.scalar = 1.0f;
 }
 
 
@@ -104,8 +111,6 @@ void ObjFile::draw (GLuint vertexLocation, GLuint normalLocation) {
 	glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(vec4) * vertices.size()));
 
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-
-	//xform.rotation = rotate(mat4(1.0f), 0.01f, vec3(1.0f, 0.0f, 0.0f)) * xform.rotation;
 }
 
 int ObjFile::numVertices () {
@@ -138,6 +143,11 @@ mat4 ObjFile::getFitTranslate () {
 
 void ObjFile::calculateNormals () {
 
+	for (int i = 0; i < vertices.size(); i++) {
+		normals.push_back({ 0.0f, 0.0f, 0.0f });
+	}
+	cout << "initialize population" << endl;
+
 	for (int i = 0; i < indices.size(); i += 3) {
 		int i1 = indices[i];
 		int i2 = indices[i+1];
@@ -148,31 +158,27 @@ void ObjFile::calculateNormals () {
 		vec4 p3 = getVertex (i3);
 		vec3 fNormal = cross (vec3 (p2 - p1), vec3 (p3 - p1));
 
-		float l = length (fNormal);
-		if (l != 0.0f) {
-			fNormal = normalize (fNormal);
+		//fNormal = normalize (fNormal);
 
-			std::cout << fNormal.x << ',' << fNormal.y << ',' << fNormal.z << std::endl; //TODO
-
-			//setNormal(i1, getNormal(i1) + fNormal);
-			//setNormal (i2, getNormal(i2) + fNormal);
-			//setNormal (i3, getNormal(i3) + fNormal);
-
-			// Set normals for each vertex of the face
-			for (int i = 0; i < 3; i++) normals.push_back(fNormal);
-
-		}
-		else {
-			cerr << "Orthogonal Normal Detected!" << endl;
-			for (int i = 0; i < 3; i++) normals.push_back({0.f, 0.f, 0.f});
-		}
+		normals[i1] = getNormal(i1) + fNormal;
+		normals[i2] = getNormal(i2) + fNormal;
+		normals[i3] = getNormal(i3) + fNormal;
 	}
+
+	cout << "done calculating" << endl;
+
+	for (int i = 0; i < normals.size(); i++) {
+		normals[i] = normalize(getNormal(i));
+	}
+
+	cout << "done normalizing" << endl;
 }
 
 void ObjFile::bufferData (GLuint vertexLocation, GLuint normalLocation) {
 
-	glGenBuffers (1, &vertexBuffer);
-	glGenBuffers (1, &indexBuffer); 
+	if (vertexBuffer == NULL) glGenBuffers(1, &vertexBuffer);
+	if (indexBuffer == NULL) glGenBuffers(1, &indexBuffer);
+	
 	glBindBuffer (GL_ARRAY_BUFFER, vertexBuffer);
 	glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 
