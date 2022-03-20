@@ -122,10 +122,7 @@ void Shader::setupRenderingContext() {
         myShaderProgram = (GLuint)NULL;
     }
 
-    // Now setup the geometry in a vertex buffer object
-
-    // setup the vertex state array object. All subsequent buffers will
-    // be bound to it.
+    // setup the vertex state array object. All subsequent buffers willbe bound to it.
     glGenVertexArrays(1, &myVAO);
     glBindVertexArray(myVAO);
 }

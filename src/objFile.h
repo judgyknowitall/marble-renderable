@@ -20,7 +20,6 @@ using namespace glm;
 
 // Transformation matrices
 struct Transformation {
-	
 	mat4 rotation = mat4(1.0f);
 	mat4 scaling = mat4(1.0f);
 	mat4 translation = mat4(1.0f);
@@ -31,21 +30,17 @@ struct Transformation {
 
 class ObjFile {
 	public:
-
 		Transformation xform;
-
 
 		ObjFile (string filename);
 		void loadObjFile(string filename);
-		void setupObj(GLuint vertexLocation);
+		void setupObj(GLuint vertexLocation, GLuint normalLocation);
 
 		void draw (GLuint vertexLocation, GLuint normalLocation);
 
 		int numVertices ();
 		vec4 getVertex (int i);
 		vec3 getNormal (int i);
-		void setVertex (int i, vec4 v);
-		void setNormal (int i, vec3 v);
 
 		mat4 getTransformation();
 		
@@ -54,7 +49,7 @@ class ObjFile {
 		GLuint vertexBuffer, indexBuffer;
 		vector<vec4> vertices;
 		vector<vec3> normals;
-		vector<ivec3> indices;
+		vector<GLuint> indices;
 
 		vec3 max, min;
 
