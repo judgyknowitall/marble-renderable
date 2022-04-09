@@ -20,9 +20,11 @@
 #include <string>
 
 #include "util/window.h"
-#include "geomPass.h"
 #include "util/objFile.h"
 #include "util/ui.h"
+#include "state.h"
+#include "geomPass.h"
+#include "lightPass.h"
 
 
 
@@ -31,55 +33,50 @@ using namespace glm;
 
 
 
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // MAIN
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
 int main(int argc, char **argv)
 {
-    // Window width and height
-    int width, height;
-
     // Setup object
     ObjFile* obj = new ObjFile("models/cube.obj");
+    State* state = new State();
 
     // Set up Graphics
-    MyWindow* window = new MyWindow(obj);
+    MyWindow* window = new MyWindow(obj, state);
     UI ui(window->getWindow());    // imgui
 
-    // Create Passes
+    // Create Rendering Passes
     GeomPass geomPass(obj);
+    LightPass lightPass(&geomPass.gBuffer);
 
     // Finish setting up obj
     if (obj->numVertices() == 0) {
         cout << "Could not load file " << argv[1] << ".\n";
         exit(EXIT_FAILURE);
     }
-    obj->setupObj(VERTEX_DATA, VERTEX_NORMAL);
+    obj->setupObj();
   
     // MAIN LOOP
     if( geomPass.shaderGenerated() ) {
         while (!glfwWindowShouldClose(window->getWindow())){
-            glfwGetFramebufferSize(window->getWindow(), &width, &height);
-            glViewport(0, 0, width, height);
+
+            // Window Resizing
+            window->handleResizing([&](int w, int h) -> void {
+                geomPass.generateBuffer(w, h);
+                });
 
             // Load new object
             if (ui.loadObj) {
-
                 obj->loadObjFile(ui.objFile);
                 if (obj->numVertices() == 0) {
                     cout << "Could not load file " << argv[1] << ".\n";
                     exit(EXIT_FAILURE);
                 }
-                obj->setupObj(VERTEX_DATA, VERTEX_NORMAL);
+                obj->setupObj();
             }
         
             // Render each pass
-            geomPass.render(width, height);
+            geomPass.render(window->width, window->height);
+            lightPass.render(state->light_rotate, [&]() { geomPass.BindTextures(); });
 
             ui.draw();
         

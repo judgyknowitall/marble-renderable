@@ -34,10 +34,10 @@ class ObjFile {
 
 		ObjFile (string filename);
 		void loadObjFile(string filename);
-		void setupObj(GLuint vertexLocation, GLuint normalLocation);
+		void setupObj();
 		void resetParams();
 
-		void draw (GLuint vertexLocation, GLuint normalLocation);
+		void draw ();
 
 		int numVertices ();
 		vec4 getVertex (int i);
@@ -48,6 +48,7 @@ class ObjFile {
 
 	private:
 		GLuint vertexBuffer = NULL, indexBuffer = NULL;
+		GLuint VAO;
 		vector<vec4> vertices;
 		vector<vec3> normals;
 		vector<GLuint> indices;
@@ -55,7 +56,7 @@ class ObjFile {
 		vec3 max, min;
 
 		void calculateNormals();
-		void bufferData(GLuint vertexLocation, GLuint normalLocation);
+		void bufferData();
 
 		mat4 getFitScale();
 		mat4 getFitTranslate();

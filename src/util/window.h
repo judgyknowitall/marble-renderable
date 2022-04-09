@@ -3,15 +3,20 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <functional>
 
 #include "objFile.h"
+#include "state.h"
 
 class MyWindow
 {
 public:
 
+    // Window width and height
+    int width, height;
+
     MyWindow() {}
-    MyWindow(ObjFile* o);
+    MyWindow(ObjFile* o, State* s);
 
     ~MyWindow()
     {
@@ -21,6 +26,7 @@ public:
     GLFWwindow* getWindow() {
         return mWindow;
     }
+    void handleResizing(function<void(int, int)> func);
 
     static void error_callback(int error, const char* description);
     void key_callback(int key, int scancode, int action, int mods);
@@ -28,6 +34,7 @@ public:
 private:
 
     ObjFile* obj;
+    State* state;
     GLFWwindow* mWindow;
 
     static void onKey(GLFWwindow* window, int key, int scancode, int actions, int mods)

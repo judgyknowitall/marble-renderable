@@ -13,23 +13,28 @@
 #include "util/objFile.h"
 #include "util/ui.h"
 
-
-// Constants to help with location bindings
-#define VERTEX_DATA 0
-#define VERTEX_NORMAL 1
-
-
-
+// 1st Pass
+// Geometry
 class GeomPass {
 public:
+
 	GeomPass(ObjFile* o);
-	void render(int width, int height);
+	void generateBuffer(unsigned int WindowWidth, unsigned int WindowHeight);
 	bool shaderGenerated() { return shader->isGenerated(); }
 
+	void render(int width, int height);
+	void BindTextures();
+
+	GLuint gBuffer;
+
 private:
+
 	Shader* shader;
 	ObjFile* obj;
-	GLuint VAO;
 
-	void generateBuffer();
+	GLuint gPosition, gNormal, gAlbedo;	// Textures
+	GLuint rboDepth;
+
+	void BindGBuffer();
+	void UnBindGBuffer();
 };

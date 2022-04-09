@@ -18,7 +18,7 @@ using namespace glm;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-MyWindow::MyWindow(ObjFile* o) : obj(o) {
+MyWindow::MyWindow(ObjFile* o, State* s) : obj(o), state(s) {
 
     glfwSetErrorCallback(onError);
 
@@ -111,8 +111,38 @@ void MyWindow::key_callback(int key, int scancode, int action, int mods)
             if (action == GLFW_RELEASE) obj->xform.scalar = 1.0f;
             else obj->xform.scalar = 1.0f / 1.01f;
             break;
+
+        // move around the light
+        case GLFW_KEY_KP_8:
+            state->rotate_light(vec3(-1.0f, 0.0f, 0.0f), 0.1f);
+            break;
+
+        case GLFW_KEY_KP_2:
+            state->rotate_light(vec3(1.0f, 0.0f, 0.0f), 0.1f);
+            break;
+
+        case GLFW_KEY_KP_4:
+            state->rotate_light(vec3(0.0f, -1.0f, 0.0f), 0.1f);
+            break;
+
+        case GLFW_KEY_KP_6:
+            state->rotate_light(vec3(0.0f, 1.0f, 0.0f), 0.1f);
+            break;
     }
 }
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// Window Main Loop Functions
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+void MyWindow::handleResizing(function<void(int, int)> func) {
+    int newWidth, newHeight;
+    glfwGetFramebufferSize(mWindow, &newWidth, &newHeight);
+    if ((newWidth != width) || (newHeight != height)) {
+        func(newWidth, newHeight);
+        width = newWidth;
+        height = newHeight;
+    }
+    glViewport(0, 0, width, height);
+}

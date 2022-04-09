@@ -13,8 +13,8 @@ class Shader {
 
 private:
 
-	GLuint myVAO;				// Vertex array object
-	GLuint myShaderProgram;		// Shader program to use
+	GLuint myVAO;					// Vertex array object
+	GLuint myShaderProgram = 0;		// Shader program to use
 
 	bool loadShaderFile(const char* filename, GLuint shader);
 	bool checkShaderCompilation(GLuint shader, std::string type);
@@ -27,5 +27,5 @@ public:
 	void setVec3(const std::string& name, const glm::vec3& value) const;
 	void setInt(const std::string& name, int value) const;
 
-	bool isGenerated() { return true; }
+	bool isGenerated() { if (myShaderProgram) return true; else return false; }
 };

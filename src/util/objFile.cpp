@@ -4,6 +4,7 @@
 
 
 #include "objFile.h"
+#include "state.h"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -16,6 +17,9 @@
 using namespace std;
 using namespace glm;
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// SET UP
+///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 ObjFile::ObjFile (string filename) {
 	loadObjFile(filename);
@@ -69,9 +73,9 @@ void ObjFile::loadObjFile(string filename) {
 }
 
 
-void ObjFile::setupObj(GLuint vertexLocation, GLuint normalLocation) {
+void ObjFile::setupObj() {
 	calculateNormals();
-	bufferData(vertexLocation, normalLocation);
+	bufferData();
 	xform.scaling = getFitScale();
 	xform.translation = getFitTranslate();
 }
@@ -93,22 +97,94 @@ void ObjFile::resetParams() {
 	xform.scalar = 1.0f;
 }
 
+void ObjFile::calculateNormals() {
 
+	for (int i = 0; i < vertices.size(); i++) {
+		normals.push_back({ 0.0f, 0.0f, 0.0f });
+	}
+
+	for (int i = 0; i < indices.size(); i += 3) {
+		int i1 = indices[i];
+		int i2 = indices[i + 1];
+		int i3 = indices[i + 2];
+
+		vec4 p1 = getVertex(i1);
+		vec4 p2 = getVertex(i2);
+		vec4 p3 = getVertex(i3);
+		vec3 fNormal = cross(vec3(p2 - p1), vec3(p3 - p1));
+
+		//fNormal = normalize (fNormal);
+
+		normals[i1] = getNormal(i1) + fNormal;
+		normals[i2] = getNormal(i2) + fNormal;
+		normals[i3] = getNormal(i3) + fNormal;
+	}
+
+	for (int i = 0; i < normals.size(); i++) {
+		normals[i] = normalize(getNormal(i));
+	}
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// RENDERING
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void ObjFile::draw (GLuint vertexLocation, GLuint normalLocation) {
+void ObjFile::bufferData() {
+
+	if (!VAO) glGenVertexArrays(1, &VAO);
+	if (vertexBuffer == NULL) glGenBuffers(1, &vertexBuffer);
+	if (indexBuffer == NULL) glGenBuffers(1, &indexBuffer);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 
-	glEnableVertexAttribArray(vertexLocation);
-	glVertexAttribPointer(vertexLocation, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
-	glEnableVertexAttribArray(normalLocation);
-	glVertexAttribPointer(normalLocation, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(vec4) * vertices.size()));
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(vec4) * vertices.size() + sizeof(vec3) * normals.size(),
+		NULL,
+		GL_STATIC_DRAW);
+
+	glBufferSubData(GL_ARRAY_BUFFER,
+		0,
+		sizeof(vec4) * vertices.size(),
+		vertices.data());
+	glBufferSubData(GL_ARRAY_BUFFER,
+		sizeof(vec4) * vertices.size(),
+		sizeof(vec3) * normals.size(),
+		normals.data());
+
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		sizeof(GLuint) * indices.size(),
+		indices.data(),
+		GL_STATIC_DRAW);
+
+	glVertexAttribPointer(VERTEX_DATA, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const GLvoid*)0);
+	glEnableVertexAttribArray(VERTEX_DATA);
+	glEnableVertexAttribArray(VERTEX_NORMAL);
+	glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(vec4) * vertices.size()));
+}
+
+
+void ObjFile::draw () {
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
+
+	glEnableVertexAttribArray(VERTEX_DATA);
+	glVertexAttribPointer(VERTEX_DATA, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
+	glEnableVertexAttribArray(VERTEX_NORMAL);
+	glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(vec4) * vertices.size()));
 
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 }
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// GETTERS / SETTERS
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 int ObjFile::numVertices () {
 	return vertices.size();
@@ -137,69 +213,6 @@ mat4 ObjFile::getFitTranslate () {
 	vec3 center = (max + min) * 0.5f;
 	return translate (mat4(1.0f), -center);
 }
-
-void ObjFile::calculateNormals () {
-
-	for (int i = 0; i < vertices.size(); i++) {
-		normals.push_back({ 0.0f, 0.0f, 0.0f });
-	}
-
-	for (int i = 0; i < indices.size(); i += 3) {
-		int i1 = indices[i];
-		int i2 = indices[i+1];
-		int i3 = indices[i+2];
-
-		vec4 p1 = getVertex (i1);
-		vec4 p2 = getVertex (i2);
-		vec4 p3 = getVertex (i3);
-		vec3 fNormal = cross (vec3 (p2 - p1), vec3 (p3 - p1));
-
-		//fNormal = normalize (fNormal);
-
-		normals[i1] = getNormal(i1) + fNormal;
-		normals[i2] = getNormal(i2) + fNormal;
-		normals[i3] = getNormal(i3) + fNormal;
-	}
-
-	for (int i = 0; i < normals.size(); i++) {
-		normals[i] = normalize(getNormal(i));
-	}
-}
-
-void ObjFile::bufferData (GLuint vertexLocation, GLuint normalLocation) {
-
-	if (vertexBuffer == NULL) glGenBuffers(1, &vertexBuffer);
-	if (indexBuffer == NULL) glGenBuffers(1, &indexBuffer);
-	
-	glBindBuffer (GL_ARRAY_BUFFER, vertexBuffer);
-	glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(vec4) * vertices.size() +  sizeof(vec3) * normals.size(),
-		NULL, 
-		GL_STATIC_DRAW);
-
-	glBufferSubData (GL_ARRAY_BUFFER,
-		0,
-		sizeof(vec4) * vertices.size(),
-		vertices.data());
-	glBufferSubData (GL_ARRAY_BUFFER,
-		sizeof(vec4) * vertices.size(),
-		sizeof(vec3) * normals.size(),
-		normals.data());
-  
-	glBufferData (GL_ELEMENT_ARRAY_BUFFER,
-		sizeof(GLuint) * indices.size(),
-		indices.data(),
-		GL_STATIC_DRAW );
-
-	glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const GLvoid*)0);
-	glEnableVertexAttribArray(vertexLocation);
-	glEnableVertexAttribArray (normalLocation);
-	glVertexAttribPointer (normalLocation, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(vec4) * vertices.size()));
-}
-
-
 
 mat4 ObjFile::getTransformation() {
 	return xform.rotation * xform.scaling * xform.translation;
