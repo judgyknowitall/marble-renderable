@@ -62,9 +62,6 @@ void ObjFile::loadObjFile(string filename) {
 			str = "";
 		}
 		reader.close();
-
-		cout << "MAX: " << max.x << " " << max.y << " " << max.z << endl;
-		cout << "MIN: " << min.x << " " << min.y << " " << min.z << endl;
 	}
 	else {
 		cerr << "File \"" << filename << "\" not found!" << endl;
@@ -146,7 +143,6 @@ void ObjFile::calculateNormals () {
 	for (int i = 0; i < vertices.size(); i++) {
 		normals.push_back({ 0.0f, 0.0f, 0.0f });
 	}
-	cout << "initialize population" << endl;
 
 	for (int i = 0; i < indices.size(); i += 3) {
 		int i1 = indices[i];
@@ -165,13 +161,9 @@ void ObjFile::calculateNormals () {
 		normals[i3] = getNormal(i3) + fNormal;
 	}
 
-	cout << "done calculating" << endl;
-
 	for (int i = 0; i < normals.size(); i++) {
 		normals[i] = normalize(getNormal(i));
 	}
-
-	cout << "done normalizing" << endl;
 }
 
 void ObjFile::bufferData (GLuint vertexLocation, GLuint normalLocation) {

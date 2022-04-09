@@ -70,6 +70,7 @@ endif()
 # Compile our main application
 file(GLOB SOURCES
     src/*
+	src/util/*
     libs/glew/src/glew.c
 	libs/imgui/*
 )
