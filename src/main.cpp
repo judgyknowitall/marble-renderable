@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 
     // Create Rendering Passes
     GeomPass geomPass(obj);
-    LightPass lightPass(&geomPass.gBuffer);
+    LightPass lightPass(&geomPass.texMaps, &geomPass.texNames);
 
     // Finish setting up obj
     if (obj->numVertices() == 0) {
@@ -76,7 +76,7 @@ int main(int argc, char **argv)
         
             // Render each pass
             geomPass.render(window->width, window->height);
-            lightPass.render(state->light_rotate, [&]() { geomPass.BindTextures(); });
+            lightPass.render(state->light_rotate);
 
             ui.draw();
         

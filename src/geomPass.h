@@ -8,6 +8,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "util/shader.h"
 #include "util/objFile.h"
@@ -25,15 +26,19 @@ public:
 	void render(int width, int height);
 	void BindTextures();
 
-	GLuint gBuffer;
+	std::vector<GLuint> texMaps;
+	std::vector<std::string> texNames;
 
 private:
 
 	Shader* shader;
 	ObjFile* obj;
 
+	GLuint gBuffer;
 	GLuint gPosition, gNormal, gAlbedo;	// Textures
 	GLuint rboDepth;
+	// texture/framebuffer storage
+	
 
 	void BindGBuffer();
 	void UnBindGBuffer();

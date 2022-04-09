@@ -15,7 +15,9 @@ using namespace glm;
 
 
 // Constructor: create shaderprogram
-LightPass::LightPass(GLuint* gbuff) : gBuffer(gbuff) {
+LightPass::LightPass(vector<GLuint>* tMaps, vector<string>* tNames) :
+    texMaps(tMaps), texNames(tNames) 
+{
     shader = new Shader(VS_FILE, FS_FILE);
 
     // Configure Global opengl State
@@ -25,9 +27,9 @@ LightPass::LightPass(GLuint* gbuff) : gBuffer(gbuff) {
     // Do any necessary initializations (enabling buffers, setting up
     // shaders, geometry etc., before entering the main loop.)
     shader->use();
-    shader->setInt("gPosition", VERTEX_DATA);
-    shader->setInt("gNormal", VERTEX_NORMAL);
-    shader->setInt("gAlbedoSpec", VERTEX_COLOR);
+    //shader->setInt("gPosition", VERTEX_DATA);
+    //shader->setInt("gNormal", VERTEX_NORMAL);
+    //shader->setInt("gAlbedo", VERTEX_COLOR);
 }
 
 
@@ -36,7 +38,7 @@ LightPass::LightPass(GLuint* gbuff) : gBuffer(gbuff) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void LightPass::render(mat4 light_rotate, function<void()> bindTextures) {
+void LightPass::render(mat4 light_rotate) {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader->use();
@@ -51,11 +53,18 @@ void LightPass::render(mat4 light_rotate, function<void()> bindTextures) {
     shader->setVec3("V", view);
 
     // AttachTextures
-    bindTextures();
+    AttachTextures();
 
     // Draw Quad
     renderQuad();
+}
 
+void LightPass::AttachTextures() {
+    for (int i = 0; i < texMaps->size(); i++) {
+        shader->setInt(texNames->at(i).c_str(), i);
+        glActiveTexture(GL_TEXTURE0 + i);
+        glBindTexture(GL_TEXTURE_2D, texMaps->at(i));
+    }
 }
 
 

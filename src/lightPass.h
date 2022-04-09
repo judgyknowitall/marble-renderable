@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include <string>
-#include <functional>
+#include <vector>
 
 #include "util/shader.h"
 #include "util/objFile.h"
@@ -18,13 +18,15 @@
 class LightPass {
 public:
 
-	LightPass(GLuint* gBuffer);
-	void render(mat4 light_rotate, function<void()> bindTextures);
+	LightPass(std::vector<GLuint>* texMaps, std::vector<std::string>* texNames);
+	void render(mat4 light_rotate);
 	void renderQuad();
+	void AttachTextures();
 
 private:
 
 	Shader* shader;
-	GLuint* gBuffer;
+	std::vector<GLuint>* texMaps; 
+	std::vector<std::string>* texNames;
 	GLuint quadVBO, quadVAO = 0;
 };

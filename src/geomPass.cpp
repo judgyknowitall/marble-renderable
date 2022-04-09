@@ -28,12 +28,53 @@ GeomPass::GeomPass(ObjFile* o) : obj(o) {
     shader->use();
     shader->setInt("position", VERTEX_DATA);
     shader->setInt("normal", VERTEX_NORMAL);
+
+    // set up the draw buffers
+    glGenFramebuffers(1, &gBuffer);
 }
 
 
 // Create gBuffer
-void GeomPass::generateBuffer(unsigned int windowWidth, unsigned int windowHeight) {
+void GeomPass::generateBuffer(unsigned int WindowWidth, unsigned int WindowHeight) {
 
+    // delete any existing textures
+    glDeleteTextures(texMaps.size(), texMaps.data());
+
+    // reserve some new ones
+    texNames.clear();
+    texMaps.resize(4);
+    glGenTextures(4, texMaps.data());
+
+    // create each of the textures
+    // 0: depth -> depth, 32F
+    texNames.push_back("gDepth");
+    glBindTexture(GL_TEXTURE_2D, texMaps[0]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, WindowWidth, WindowHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);	// disable filtering
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // 1: RGB -> albedo, A -> roughness, 16F
+    texNames.push_back("gAlbedo");
+    glBindTexture(GL_TEXTURE_2D, texMaps[1]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, WindowWidth, WindowHeight, 0, GL_RGBA, GL_HALF_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // 2: RGB -> normal (XYZ), 32F
+    texNames.push_back("gNormal");
+    glBindTexture(GL_TEXTURE_2D, texMaps[2]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // 3: RGB -> view coords, 32F
+    texNames.push_back("gView");
+    glBindTexture(GL_TEXTURE_2D, texMaps[3]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    /*
     if (gBuffer) glDeleteBuffers(1, &gBuffer);
     if (gPosition) glDeleteTextures(1, &gPosition);
     if (gNormal) glDeleteTextures(1, &gNormal);
@@ -82,7 +123,7 @@ void GeomPass::generateBuffer(unsigned int windowWidth, unsigned int windowHeigh
     // finally check if framebuffer is complete
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "Framebuffer not complete!" << std::endl;
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, 0); */
 }
 
 
@@ -116,6 +157,7 @@ void GeomPass::render(int width, int height) {
 
     // Note that this version of the draw command uses the
     // bound index buffer to get the vertex coordinates.
+    BindTextures();
     obj->draw();
 
     UnBindGBuffer();
@@ -137,10 +179,21 @@ void GeomPass::UnBindGBuffer() {
 
 // For Next Pass
 void GeomPass::BindTextures() {
+    /*
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, gPosition);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, gNormal);
     glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, gAlbedo);
+    glBindTexture(GL_TEXTURE_2D, gAlbedo); */
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texMaps[0], 0);
+
+    vector<GLenum> attach;
+    for (int i = 1; i < texMaps.size(); i++) {
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, GL_TEXTURE_2D, texMaps[i], 0);
+        attach.push_back(GL_COLOR_ATTACHMENT0 + i);
+    }
+    glDrawBuffers(attach.size(), attach.data());
 }
+
