@@ -47,18 +47,25 @@ class ObjFile {
 		
 
 	private:
+
 		GLuint vertexBuffer = NULL, indexBuffer = NULL;
 		GLuint VAO = NULL;
 		vector<vec4> vertices;
 		vector<vec3> normals;
-		vector<vec4> colors;
 		vector<GLuint> indices;
+
+		// Marble Texture
+		GLuint marbleTexture = NULL;
+		vector<vec3> marbleNoise;
+		vector<vec4> colors;
+		vector<vec2> textureCoords;
 
 		vec3 max, min;
 
 		void calculateNormals();
 		void calculateColors();
 		void bufferData();
+		void interpretData();
 
 		mat4 getFitScale();
 		mat4 getFitTranslate();

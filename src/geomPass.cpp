@@ -118,6 +118,10 @@ void GeomPass::render(int width, int height) {
     mat4 proj = perspective(45.0f, (float)width / (float)height, 0.1f, 100.0f);
     shader->setMat4("projection", proj);
 
+    // Marble Texture
+    shader->setInt("marbleTexture", 0);
+    glActiveTexture(GL_TEXTURE0);
+
     // Note that this version of the draw command uses the
     // bound index buffer to get the vertex coordinates.
     BindTextures();

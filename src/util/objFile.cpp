@@ -13,6 +13,9 @@
 #include <string>
 #include <iostream>
 
+#define MARBLE_TEX_WIDTH 10
+#define MARBLE_TEX_HEIGHT 10
+
 
 using namespace std;
 using namespace glm;
@@ -130,13 +133,89 @@ void ObjFile::calculateNormals() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
-// Calcularing Colors
+// Generate Marble Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void ObjFile::calculateColors() {
-	for (int i = 0; i < vertices.size(); i++) {
-		colors.push_back({ 1.0f, 0.5f, 0.2f, 1.0f });
+#define noiseWidth 320
+#define noiseHeight 240
+float noise[noiseHeight][noiseWidth];
+
+float smoothNoise(float x, float y)
+{
+	//get fractional part of x and y
+	float fractX = x - int(x);
+	float fractY = y - int(y);
+
+	//wrap around
+	int x1 = (int(x) + noiseWidth) % noiseWidth;
+	int y1 = (int(y) + noiseHeight) % noiseHeight;
+
+	//neighbor values
+	int x2 = (x1 + noiseWidth - 1) % noiseWidth;
+	int y2 = (y1 + noiseHeight - 1) % noiseHeight;
+
+	//smooth the noise with bilinear interpolation
+	float value = 0.0;
+	value += fractX * fractY * noise[y1][x1];
+	value += (1 - fractX) * fractY * noise[y1][x2];
+	value += fractX * (1 - fractY) * noise[y2][x1];
+	value += (1 - fractX) * (1 - fractY) * noise[y2][x2];
+
+	return value;
+}
+
+
+float turbulence(float x, float y, float size)
+{
+	float value = 0.0, initialSize = size;
+
+	while (size >= 1)
+	{
+		value += smoothNoise(x / size, y / size) * size;
+		size /= 2.0;
 	}
+
+	return(128.0 * value / initialSize);
+}
+
+
+float MarbleTexture(float x, float y) {
+	//xPeriod and yPeriod together define the angle of the lines
+	//xPeriod and yPeriod both 0 ==> it becomes a normal clouds or turbulence pattern
+	float xPeriod = 5.0; //defines repetition of marble lines in x direction
+	float yPeriod = 10.0; //defines repetition of marble lines in y direction
+	//turbPower = 0 ==> it becomes a normal sine pattern
+	float turbPower = 5.0; //makes twists
+	float turbSize = 32.0; //initial size of the turbulence
+
+	//float xyValue = x * xPeriod / noiseWidth + y * yPeriod / noiseHeight + turbPower * turbulence(x, y, turbSize) / 256.0;
+	float xyValue = x * xPeriod / noiseWidth + y * yPeriod / noiseHeight;
+	float c = abs(sin(xyValue * 3.14159));
+
+	return c;
+}
+
+
+
+void ObjFile::calculateColors() {
+	
+	// Create Texture
+	for (int s = 0; s < MARBLE_TEX_WIDTH; s++) {
+		for (int t = 0; t < MARBLE_TEX_HEIGHT; t++) {
+			float c = MarbleTexture(s,t);	// Basic sine function
+			cout << c << endl;
+			marbleNoise.push_back(vec3(c,c,c));
+			//marbleNoise.push_back(vec3(1.f, 0.f, 0.f));
+		}
+	}
+
+	// Texture Mapping
+	//for (int i = 0; i < vertices.size(); i) {
+
+	//}
+
+
+	//cout << vertices.size() << ',' << colors.size() << endl;
 }
 
 
@@ -158,10 +237,11 @@ void ObjFile::bufferData() {
 
 	auto vSize = sizeof(vec4) * vertices.size();
 	auto nSize = sizeof(vec3) * normals.size();
-	auto cSize = sizeof(vec4) * colors.size();
+	//auto cSize = sizeof(vec4) * colors.size();
+	auto tSize = sizeof(vec2) * textureCoords.size();
 
 	glBufferData(GL_ARRAY_BUFFER,
-		vSize + nSize + cSize,
+		vSize + nSize + tSize,
 		NULL,
 		GL_STATIC_DRAW);
 
@@ -175,7 +255,7 @@ void ObjFile::bufferData() {
 		normals.data());
 	glBufferSubData(GL_ARRAY_BUFFER,
 		vSize + nSize,
-		cSize,
+		tSize,
 		colors.data());
 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
@@ -183,12 +263,20 @@ void ObjFile::bufferData() {
 		indices.data(),
 		GL_STATIC_DRAW);
 
-	glEnableVertexAttribArray(VERTEX_DATA);
-	glEnableVertexAttribArray(VERTEX_NORMAL);
-	glEnableVertexAttribArray(VERTEX_COLOR);
-	glVertexAttribPointer(VERTEX_DATA, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const GLvoid*)0);
-	glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(vSize));
-	glVertexAttribPointer(VERTEX_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(vSize + nSize));
+	interpretData();
+
+	// Generate Texture
+	if (MarbleTexture != NULL) glDeleteTextures(1, &marbleTexture);
+	glGenTextures(1, &marbleTexture);
+	glBindTexture(GL_TEXTURE_2D, marbleTexture);
+	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, MARBLE_TEX_WIDTH, MARBLE_TEX_HEIGHT, 0, GL_RGB, GL_FLOAT, &marbleNoise[0]);
+	glGenerateMipmap(GL_TEXTURE_2D); //TODO needed?
 }
 
 
@@ -197,6 +285,17 @@ void ObjFile::draw () {
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 
+	// Bind Texture
+	glBindTexture(GL_TEXTURE_2D, marbleTexture);
+
+	interpretData();
+
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+
+void ObjFile::interpretData() {
 	auto vSize = sizeof(vec4) * vertices.size();
 	auto nSize = sizeof(vec3) * normals.size();
 
@@ -205,10 +304,7 @@ void ObjFile::draw () {
 	glEnableVertexAttribArray(VERTEX_NORMAL);
 	glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(vSize));
 	glEnableVertexAttribArray(VERTEX_COLOR);
-	glVertexAttribPointer(VERTEX_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(vSize + nSize));
-
-	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+	glVertexAttribPointer(VERTEX_COLOR, 2, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(vSize + nSize));
 }
 
 
