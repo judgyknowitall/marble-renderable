@@ -26,7 +26,7 @@ void main()
     float depth = texture(gDepth, TexCoords).x;
     if (depth == 1) {
         FragColor = bg;
-        //return;
+        return;
     }
 
     // retrieve data from gbuffer
