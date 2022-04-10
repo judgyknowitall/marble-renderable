@@ -208,14 +208,15 @@ void ObjFile::calculateColors() {
 			//float c = MarbleTexture(s,t);	// Basic sine function
 			//cout << c << endl;
 			//marbleNoise.push_back(vec3(c,c,c));
-			marbleNoise.push_back(vec3(1, 1.f, 0.f));
+			marbleNoise.push_back(vec3(s / MARBLE_TEX_WIDTH, .5f, 0.f));
 			cout << s / MARBLE_TEX_WIDTH << endl;
 		}
 	}
 
 	// Texture Mapping
-	for (int i = 0; i < vertices.size(); i++) {
-		textureCoords.push_back(vec2(0.5f, 0.5f));
+	for (auto vertex : vertices) {
+		textureCoords.push_back(vec2(vertex.x, vertex.z));
+		//cout << vertex.x << ',' << vertex.y << ',' << vertex.z << endl;
 	}
 
 	cout << vertices.size() << ',' << marbleNoise.size() << endl;
@@ -274,8 +275,8 @@ void ObjFile::bufferData() {
 	// set the texture wrapping/filtering options (on the currently bound texture object)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, MARBLE_TEX_WIDTH, MARBLE_TEX_HEIGHT, 0, GL_RGB, GL_FLOAT, &marbleNoise[0]);
 }
