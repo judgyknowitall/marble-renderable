@@ -55,9 +55,8 @@ class ObjFile {
 		vector<GLuint> indices;
 
 		// Marble Texture
-		GLuint marbleTexture = NULL;
-		vector<vec3> marbleNoise;
-		vector<vec4> colors;
+		GLuint marbleTexture = NULL;	// OpenGL Texture
+		vector<vec3> marbleNoise;		// Generated image
 		vector<vec2> textureCoords;
 
 		vec3 max, min;

@@ -26,10 +26,11 @@ void main()
     // start writing it all out
     //gColor = Color;
     gColor = texture(marbleTexture, TexCoord);
+    //gColor = vec4(TexCoord, 0.0, 1.0);
 
     //float c = marbleTexture();
     //gColor.rgb = vec3(c, c, c);
-    gColor.a = float(render_modifier) / 9.;		// ranges from 0 to 1
+    //gColor.a = float(render_modifier) / 9.;		// ranges from 0 to 1
 }
 
 

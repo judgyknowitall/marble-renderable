@@ -22,6 +22,7 @@ void main()
     
     //Color = color;
     TexCoord = texCoord;
+    //TexCoord = vec2(1.f, 1.f);
 
     Normal = mat3(view * model) * normal;
 

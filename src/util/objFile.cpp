@@ -198,24 +198,27 @@ float MarbleTexture(float x, float y) {
 
 
 void ObjFile::calculateColors() {
+
+	marbleNoise.clear();
+	textureCoords.clear();
 	
 	// Create Texture
-	for (int s = 0; s < MARBLE_TEX_WIDTH; s++) {
-		for (int t = 0; t < MARBLE_TEX_HEIGHT; t++) {
-			float c = MarbleTexture(s,t);	// Basic sine function
-			cout << c << endl;
-			marbleNoise.push_back(vec3(c,c,c));
-			//marbleNoise.push_back(vec3(1.f, 0.f, 0.f));
+	for (float s = 0; s < MARBLE_TEX_WIDTH; s++) {
+		for (float t = 0; t < MARBLE_TEX_HEIGHT; t++) {
+			//float c = MarbleTexture(s,t);	// Basic sine function
+			//cout << c << endl;
+			//marbleNoise.push_back(vec3(c,c,c));
+			marbleNoise.push_back(vec3(1, 1.f, 0.f));
+			cout << s / MARBLE_TEX_WIDTH << endl;
 		}
 	}
 
 	// Texture Mapping
-	//for (int i = 0; i < vertices.size(); i) {
+	for (int i = 0; i < vertices.size(); i++) {
+		textureCoords.push_back(vec2(0.5f, 0.5f));
+	}
 
-	//}
-
-
-	//cout << vertices.size() << ',' << colors.size() << endl;
+	cout << vertices.size() << ',' << marbleNoise.size() << endl;
 }
 
 
@@ -237,7 +240,6 @@ void ObjFile::bufferData() {
 
 	auto vSize = sizeof(vec4) * vertices.size();
 	auto nSize = sizeof(vec3) * normals.size();
-	//auto cSize = sizeof(vec4) * colors.size();
 	auto tSize = sizeof(vec2) * textureCoords.size();
 
 	glBufferData(GL_ARRAY_BUFFER,
@@ -256,7 +258,7 @@ void ObjFile::bufferData() {
 	glBufferSubData(GL_ARRAY_BUFFER,
 		vSize + nSize,
 		tSize,
-		colors.data());
+		textureCoords.data());
 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
 		sizeof(GLuint) * indices.size(),
@@ -270,23 +272,22 @@ void ObjFile::bufferData() {
 	glGenTextures(1, &marbleTexture);
 	glBindTexture(GL_TEXTURE_2D, marbleTexture);
 	// set the texture wrapping/filtering options (on the currently bound texture object)
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, MARBLE_TEX_WIDTH, MARBLE_TEX_HEIGHT, 0, GL_RGB, GL_FLOAT, &marbleNoise[0]);
-	glGenerateMipmap(GL_TEXTURE_2D); //TODO needed?
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, MARBLE_TEX_WIDTH, MARBLE_TEX_HEIGHT, 0, GL_RGB, GL_FLOAT, &marbleNoise[0]);
 }
 
 
 void ObjFile::draw () {
+	// Bind Texture
+	glBindTexture(GL_TEXTURE_2D, marbleTexture);
+
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
-
-	// Bind Texture
-	glBindTexture(GL_TEXTURE_2D, marbleTexture);
 
 	interpretData();
 
