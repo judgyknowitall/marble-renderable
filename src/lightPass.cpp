@@ -19,17 +19,6 @@ LightPass::LightPass(vector<GLuint>* tMaps, vector<string>* tNames) :
     texMaps(tMaps), texNames(tNames) 
 {
     shader = new Shader(VS_FILE, FS_FILE);
-
-    // Configure Global opengl State
-    glClearColor(0.f, 0.f, 0.f, 1.f);
-    glEnable(GL_DEPTH_TEST);
-
-    // Do any necessary initializations (enabling buffers, setting up
-    // shaders, geometry etc., before entering the main loop.)
-    shader->use();
-    for (int i = 0; i < texMaps->size(); i++) {
-        shader->setInt(texNames->at(i).c_str(), i);
-    }
 }
 
 
@@ -40,7 +29,7 @@ LightPass::LightPass(vector<GLuint>* tMaps, vector<string>* tNames) :
 
 void LightPass::render(mat4 light_rotate) {
 
-    glClearColor(0.f, 0.f, 0.f, 1.f); //TODO: bg colour later
+    glClearColor(0.2f, 0.f, 0.f, 1.f); //TODO: bg colour later
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader->use();
 
@@ -62,7 +51,7 @@ void LightPass::render(mat4 light_rotate) {
 
 void LightPass::AttachTextures() {
     for (int i = 0; i < texMaps->size(); i++) {
-        shader->setInt(texNames->at(i).c_str(), i);
+        shader->setInt(texNames->at(i), i);
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, texMaps->at(i));
     }

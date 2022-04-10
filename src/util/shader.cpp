@@ -3,6 +3,8 @@
 #include <sstream>
 #include <fstream>
 
+#include "state.h"
+
 using namespace std;
 
 
@@ -44,6 +46,10 @@ Shader::Shader(string vsFilename, string fsFilename) {
     myShaderProgram = glCreateProgram();
     glAttachShader(myShaderProgram, hVertexShader);
     glAttachShader(myShaderProgram, hFragmentShader);
+
+    //glBindAttribLocation(myShaderProgram, VERTEX_DATA, "position");
+    //glBindAttribLocation( myShaderProgram, VERTEX_COLOUR, "vColor" );
+    //glBindAttribLocation(myShaderProgram, VERTEX_NORMAL, "normal");
 
     // Link Program
     glLinkProgram(myShaderProgram);

@@ -6,6 +6,9 @@
 #define VS_FILE "shaders/geomPass.vs.glsl"
 #define FS_FILE "shaders/geomPass.fs.glsl"
 
+//#define VS_FILE "shaders/phong.vs.glsl"
+//#define FS_FILE "shaders/phong.fs.glsl"
+
 
 
 using namespace std;
@@ -21,6 +24,7 @@ GeomPass::GeomPass(ObjFile* o) : obj(o) {
     // Configure Global opengl State
     glClearColor(0.f, 0.f, 0.f, 1.f);
     glEnable(GL_DEPTH_TEST);
+    /*
     glEnable(GL_SMOOTH);
     glEnable(GL_TEXTURE_2D);
     glEnable(GL_CULL_FACE);
@@ -31,18 +35,21 @@ GeomPass::GeomPass(ObjFile* o) : obj(o) {
 
     glShadeModel(GL_SMOOTH);
     glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
+    */
 
     // set up the draw buffers
     glGenFramebuffers(1, &gBuffer);
 
-    // Do any necessary initializations (enabling buffers, setting up
-    // shaders, geometry etc., before entering the main loop.)
+    // Create Shader
     shader = new Shader(VS_FILE, FS_FILE);
+    shader->use();
+    shader->setInt("position", 0);
+    shader->setInt("normal", 1);
 }
 
 
 // Create gBuffer
-void GeomPass::generateBuffer(unsigned int WindowWidth, unsigned int WindowHeight) {
+void GeomPass::generateTextures(unsigned int WindowWidth, unsigned int WindowHeight) {
 
     // delete any existing textures
     glDeleteTextures(texMaps.size(), texMaps.data());
@@ -133,15 +140,8 @@ void GeomPass::UnBindGBuffer() {
 }
 
 
-// For Next Pass
+// Bind to gBuffer
 void GeomPass::BindTextures() {
-    /*
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, gPosition);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, gNormal);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, gAlbedo); */
 
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, texMaps[0], 0);
 

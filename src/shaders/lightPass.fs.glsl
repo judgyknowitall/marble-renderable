@@ -53,9 +53,13 @@ void main()
 
 
     // TESTS
-    FragColor = vec4( Diffuse, 1.0 );	// albedo
+    //FragColor = vec4( Diffuse, 1.0 );	// albedo
     //FragColor = vec4(Specular, Specular, Specular, 1.0);	// roughness
     //FragColor = vec4(FragPos, 1.0);	// TEST COORDS
     //FragColor = vec4(Normal, 1.0);	    // view normal
     //FragColor = vec4(TexCoords, 0.0, 1.0);		// screen space
+
+    float d2 = depth * depth;
+    float d4 = depth * depth;
+    //FragColor = vec4(d4 * d4, d4, depth, 1.0);	// depth value
 }

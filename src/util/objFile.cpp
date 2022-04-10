@@ -133,7 +133,7 @@ void ObjFile::calculateNormals() {
 
 void ObjFile::bufferData() {
 
-	if (!VAO) glGenVertexArrays(1, &VAO);
+	if (VAO == NULL) glGenVertexArrays(1, &VAO);
 	if (vertexBuffer == NULL) glGenBuffers(1, &vertexBuffer);
 	if (indexBuffer == NULL) glGenBuffers(1, &indexBuffer);
 

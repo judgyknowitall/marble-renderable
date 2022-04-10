@@ -12,14 +12,17 @@ out vec3 view_dir;
 
 
 // Uniforms
-uniform mat4 mv_matrix;
-uniform mat4 proj_matrix;
-uniform vec3 light_pos = vec3(100.0, 100.0, -100.0);    // Position of light
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+uniform vec3 light_pos = vec3(1.0, 1.0, -1.0);    // Position of light
 
 
 
 void main(void)
 {
+    mat4 mv_matrix = view * model;
+
     // Calculate view-space coordinate
     vec4 P = mv_matrix * position;
 
@@ -33,6 +36,6 @@ void main(void)
     view_dir = -P.xyz;
 
     // Calculate the clip-space position of each vertex
-    gl_Position = proj_matrix * P;
+    gl_Position = projection * P;
 	gl_Position = gl_Position / gl_Position.w;
 }

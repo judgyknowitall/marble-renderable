@@ -20,11 +20,10 @@ class GeomPass {
 public:
 
 	GeomPass(ObjFile* o);
-	void generateBuffer(unsigned int WindowWidth, unsigned int WindowHeight);
+	void generateTextures(unsigned int WindowWidth, unsigned int WindowHeight);
 	bool shaderGenerated() { return shader->isGenerated(); }
-
 	void render(int width, int height);
-	void BindTextures();
+	
 
 	// texture/framebuffer storage
 	std::vector<GLuint> texMaps;
@@ -37,7 +36,7 @@ private:
 
 	GLuint gBuffer;
 	
-
 	void BindGBuffer();
 	void UnBindGBuffer();
+	void BindTextures();
 };

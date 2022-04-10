@@ -17,11 +17,11 @@ class State {
 public:
 
 	// allow the light to be rotated
-	mat4 light_rotate = mat4(1.0);
+	glm::mat4 light_rotate = glm::mat4(1.0);
 
 	// Methods //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	void rotate_light(const vec3& axis, const float& amount) {
-		light_rotate = glm::rotate(mat4(1.0f), amount, axis) * light_rotate;
+	void rotate_light(const glm::vec3& axis, const float& amount) {
+		light_rotate = glm::rotate(glm::mat4(1.0f), amount, axis) * light_rotate;
 	}
 };

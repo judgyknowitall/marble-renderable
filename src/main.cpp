@@ -61,7 +61,7 @@ int main(int argc, char **argv)
 
             // Window Resizing
             window->handleResizing([&](int w, int h) -> void {
-                geomPass.generateBuffer(w, h);
+                geomPass.generateTextures(w, h);
             });
 
             // Load new object

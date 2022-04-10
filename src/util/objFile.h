@@ -48,7 +48,7 @@ class ObjFile {
 
 	private:
 		GLuint vertexBuffer = NULL, indexBuffer = NULL;
-		GLuint VAO;
+		GLuint VAO = NULL;
 		vector<vec4> vertices;
 		vector<vec3> normals;
 		vector<GLuint> indices;
