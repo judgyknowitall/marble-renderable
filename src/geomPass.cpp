@@ -54,7 +54,7 @@ void GeomPass::generateBuffer(unsigned int WindowWidth, unsigned int WindowHeigh
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // 1: RGB -> albedo, A -> roughness, 16F
-    texNames.push_back("gAlbedo");
+    texNames.push_back("gColor");
     glBindTexture(GL_TEXTURE_2D, texMaps[1]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, WindowWidth, WindowHeight, 0, GL_RGBA, GL_HALF_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -68,7 +68,7 @@ void GeomPass::generateBuffer(unsigned int WindowWidth, unsigned int WindowHeigh
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // 3: RGB -> view coords, 32F
-    texNames.push_back("gView");
+    texNames.push_back("gPosition");
     glBindTexture(GL_TEXTURE_2D, texMaps[3]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);

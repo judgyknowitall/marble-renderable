@@ -1,9 +1,16 @@
 #version 410 core
 
+
 layout(location = 0) in vec3 aPos;
 layout(location = 1) in vec2 aTexCoords;
 
+/*
+layout(location = 0) in vec4 position;
+layout(location = 1) in vec3 normal;
+*/
+
 out vec2 TexCoords;
+//out vec3 W;
 
 void main()
 {

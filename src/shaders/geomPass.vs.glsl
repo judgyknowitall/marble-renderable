@@ -1,12 +1,14 @@
 #version 410 core
 
-layout(location = 0) in vec3 aPos;
-layout(location = 1) in vec3 aNormal;
-layout(location = 2) in vec2 aTexCoords;
+// Inputs
+layout(location = 0) in vec4 position;
+layout(location = 1) in vec3 normal;
+//layout(location = 2) in vec2 aTexCoords;
 
 out vec3 FragPos;
-out vec2 TexCoords;
 out vec3 Normal;
+//out vec2 TexCoords;
+
 
 uniform mat4 model;
 uniform mat4 view;
@@ -14,12 +16,12 @@ uniform mat4 projection;
 
 void main()
 {
-    vec4 worldPos = model * vec4(aPos, 1.0);
-    FragPos = worldPos.xyz;
-    TexCoords = aTexCoords;
+    vec4 worldPos = model * position;
+    //TexCoords = aTexCoords;
 
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
-    Normal = normalMatrix * aNormal;
+    Normal = mat3(view * model) * normal;
 
     gl_Position = projection * view * worldPos;
+    gl_Position = gl_Position / gl_Position.w;
+    FragPos = gl_Position.xyz;
 }

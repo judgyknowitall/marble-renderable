@@ -26,6 +26,7 @@ public:
 	void render(int width, int height);
 	void BindTextures();
 
+	// texture/framebuffer storage
 	std::vector<GLuint> texMaps;
 	std::vector<std::string> texNames;
 
@@ -37,7 +38,6 @@ private:
 	GLuint gBuffer;
 	GLuint gPosition, gNormal, gAlbedo;	// Textures
 	GLuint rboDepth;
-	// texture/framebuffer storage
 	
 
 	void BindGBuffer();

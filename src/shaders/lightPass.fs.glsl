@@ -3,23 +3,28 @@
 out vec4 FragColor;
 
 in vec2 TexCoords;
+//in vec3 W;
 
 // Input from gBuffer
 uniform sampler2D gPosition;
 uniform sampler2D gNormal;
-uniform sampler2D gAlbedo;
+uniform sampler2D gColor;
 uniform sampler2D gDepth;
 
 
 // Uniforms
 uniform vec3 L;     // Light Position
 uniform vec3 V;     // View Position
-uniform vec4 bg = vec4(0.2, 0.1, 0, 1);     // the background colour
-uniform vec3 ambient = vec3(0.1, 0.07, 0.03); // Ambient Light
+
+uniform vec4 bg = vec4(0.2, 0.1, 0, 1);         // the background colour
+uniform vec3 ambient = vec3(0.1, 0.07, 0.03);   // Ambient Light
 
 
 void main()
 {
+    // convert the world coords into a texture lookup
+    //vec2 UV = (W.xy * .5) + .5;
+
     // check if we're a background pixel ASAP to save on computing
     float depth = texture(gDepth, TexCoords).x;
     if (depth == 1) {
@@ -30,8 +35,8 @@ void main()
     // retrieve data from gbuffer
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
     vec3 Normal = texture(gNormal, TexCoords).rgb;
-    vec3 Diffuse = texture(gAlbedo, TexCoords).rgb;
-    float Specular = texture(gAlbedo, TexCoords).a;
+    vec3 Diffuse = texture(gColor, TexCoords).rgb;
+    float Specular = texture(gColor, TexCoords).a;
 
     float specular_power = 81 * Specular * Specular;
 
