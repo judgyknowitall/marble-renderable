@@ -51,11 +51,13 @@ class ObjFile {
 		GLuint VAO = NULL;
 		vector<vec4> vertices;
 		vector<vec3> normals;
+		vector<vec4> colors;
 		vector<GLuint> indices;
 
 		vec3 max, min;
 
 		void calculateNormals();
+		void calculateColors();
 		void bufferData();
 
 		mat4 getFitScale();

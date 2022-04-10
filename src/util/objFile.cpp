@@ -25,6 +25,36 @@ ObjFile::ObjFile (string filename) {
 	loadObjFile(filename);
 }
 
+
+void ObjFile::setupObj() {
+	calculateNormals();
+	calculateColors();
+	bufferData();
+	xform.scaling = getFitScale();
+	xform.translation = getFitTranslate();
+}
+
+
+void ObjFile::resetParams() {
+
+	// Vectors
+	vertices.clear();
+	normals.clear();
+	indices.clear();
+	max = { -100, -100, -100 };
+	min = { 100, 100, 100 };
+
+	// Transformations
+	xform.rotation = mat4(1.0f);
+	xform.scaling = mat4(1.0f);
+	xform.translation = mat4(1.0f);
+	xform.scalar = 1.0f;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// Caculate vertices and normals
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
 void ObjFile::loadObjFile(string filename) {
 
 	cout << "Loading Object: \"" << filename << "\"" << endl;
@@ -73,30 +103,6 @@ void ObjFile::loadObjFile(string filename) {
 }
 
 
-void ObjFile::setupObj() {
-	calculateNormals();
-	bufferData();
-	xform.scaling = getFitScale();
-	xform.translation = getFitTranslate();
-}
-
-
-void ObjFile::resetParams() {
-
-	// Vectors
-	vertices.clear();
-	normals.clear();
-	indices.clear();
-	max = { -100, -100, -100 };
-	min = { 100, 100, 100 };
-
-	// Transformations
-	xform.rotation = mat4(1.0f);
-	xform.scaling = mat4(1.0f);
-	xform.translation = mat4(1.0f);
-	xform.scalar = 1.0f;
-}
-
 void ObjFile::calculateNormals() {
 
 	for (int i = 0; i < vertices.size(); i++) {
@@ -113,8 +119,6 @@ void ObjFile::calculateNormals() {
 		vec4 p3 = getVertex(i3);
 		vec3 fNormal = cross(vec3(p2 - p1), vec3(p3 - p1));
 
-		//fNormal = normalize (fNormal);
-
 		normals[i1] = getNormal(i1) + fNormal;
 		normals[i2] = getNormal(i2) + fNormal;
 		normals[i3] = getNormal(i3) + fNormal;
@@ -124,6 +128,18 @@ void ObjFile::calculateNormals() {
 		normals[i] = normalize(getNormal(i));
 	}
 }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+// Calcularing Colors
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void ObjFile::calculateColors() {
+	for (int i = 0; i < vertices.size(); i++) {
+		colors.push_back({ 1.0f, 0.5f, 0.2f, 1.0f });
+	}
+}
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -140,29 +156,39 @@ void ObjFile::bufferData() {
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 
+	auto vSize = sizeof(vec4) * vertices.size();
+	auto nSize = sizeof(vec3) * normals.size();
+	auto cSize = sizeof(vec4) * colors.size();
+
 	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(vec4) * vertices.size() + sizeof(vec3) * normals.size(),
+		vSize + nSize + cSize,
 		NULL,
 		GL_STATIC_DRAW);
 
 	glBufferSubData(GL_ARRAY_BUFFER,
 		0,
-		sizeof(vec4) * vertices.size(),
+		vSize,
 		vertices.data());
 	glBufferSubData(GL_ARRAY_BUFFER,
-		sizeof(vec4) * vertices.size(),
-		sizeof(vec3) * normals.size(),
+		vSize,
+		nSize,
 		normals.data());
+	glBufferSubData(GL_ARRAY_BUFFER,
+		vSize + nSize,
+		cSize,
+		colors.data());
 
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
 		sizeof(GLuint) * indices.size(),
 		indices.data(),
 		GL_STATIC_DRAW);
 
-	glVertexAttribPointer(VERTEX_DATA, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const GLvoid*)0);
 	glEnableVertexAttribArray(VERTEX_DATA);
 	glEnableVertexAttribArray(VERTEX_NORMAL);
-	glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(vec4) * vertices.size()));
+	glEnableVertexAttribArray(VERTEX_COLOR);
+	glVertexAttribPointer(VERTEX_DATA, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (const GLvoid*)0);
+	glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(vSize));
+	glVertexAttribPointer(VERTEX_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(vSize + nSize));
 }
 
 
@@ -171,10 +197,15 @@ void ObjFile::draw () {
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBuffer);
 
+	auto vSize = sizeof(vec4) * vertices.size();
+	auto nSize = sizeof(vec3) * normals.size();
+
 	glEnableVertexAttribArray(VERTEX_DATA);
 	glVertexAttribPointer(VERTEX_DATA, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)0);
 	glEnableVertexAttribArray(VERTEX_NORMAL);
-	glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(sizeof(vec4) * vertices.size()));
+	glVertexAttribPointer(VERTEX_NORMAL, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(vSize));
+	glEnableVertexAttribArray(VERTEX_COLOR);
+	glVertexAttribPointer(VERTEX_COLOR, 4, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(vSize + nSize));
 
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
