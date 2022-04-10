@@ -3,13 +3,12 @@
 out vec4 FragColor;
 
 in vec2 TexCoords;
-//in vec3 W;
 
 // Input from gBuffer
-uniform sampler2D gPosition;
-uniform sampler2D gNormal;
-uniform sampler2D gColor;
 uniform sampler2D gDepth;
+uniform sampler2D gColor;
+uniform sampler2D gNormal;
+uniform sampler2D gPosition;
 
 
 // Uniforms
@@ -22,19 +21,17 @@ uniform vec3 ambient = vec3(0.1, 0.07, 0.03);   // Ambient Light
 
 void main()
 {
-    // convert the world coords into a texture lookup
-    //vec2 UV = (W.xy * .5) + .5;
 
     // check if we're a background pixel ASAP to save on computing
     float depth = texture(gDepth, TexCoords).x;
     if (depth == 1) {
         FragColor = bg;
-        return;
+        //return;
     }
 
     // retrieve data from gbuffer
-    vec3 FragPos = texture(gPosition, TexCoords).rgb;
-    vec3 Normal = texture(gNormal, TexCoords).rgb;
+    vec3 FragPos = texture(gPosition, TexCoords).xyz;
+    vec3 Normal = texture(gNormal, TexCoords).xyz;
     vec3 Diffuse = texture(gColor, TexCoords).rgb;
     float Specular = texture(gColor, TexCoords).a;
 
@@ -53,4 +50,12 @@ void main()
         vec3 specular = pow(max(dot(R, FragPos), 0.0), specular_power) * Specular * vec3(1, 1, 1);
         FragColor = vec4(ambient + diffuse + specular, 1.0);
     }
+
+
+    // TESTS
+    FragColor = vec4( Diffuse, 1.0 );	// albedo
+    //FragColor = vec4(Specular, Specular, Specular, 1.0);	// roughness
+    //FragColor = vec4(FragPos, 1.0);	// TEST COORDS
+    //FragColor = vec4(Normal, 1.0);	    // view normal
+    //FragColor = vec4(TexCoords, 0.0, 1.0);		// screen space
 }

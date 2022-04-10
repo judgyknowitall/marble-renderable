@@ -36,8 +36,6 @@ private:
 	ObjFile* obj;
 
 	GLuint gBuffer;
-	GLuint gPosition, gNormal, gAlbedo;	// Textures
-	GLuint rboDepth;
 	
 
 	void BindGBuffer();

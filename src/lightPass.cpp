@@ -27,9 +27,9 @@ LightPass::LightPass(vector<GLuint>* tMaps, vector<string>* tNames) :
     // Do any necessary initializations (enabling buffers, setting up
     // shaders, geometry etc., before entering the main loop.)
     shader->use();
-    //shader->setInt("gPosition", VERTEX_DATA);
-    //shader->setInt("gNormal", VERTEX_NORMAL);
-    //shader->setInt("gAlbedo", VERTEX_COLOR);
+    for (int i = 0; i < texMaps->size(); i++) {
+        shader->setInt(texNames->at(i).c_str(), i);
+    }
 }
 
 
@@ -40,6 +40,7 @@ LightPass::LightPass(vector<GLuint>* tMaps, vector<string>* tNames) :
 
 void LightPass::render(mat4 light_rotate) {
 
+    glClearColor(0.f, 0.f, 0.f, 1.f); //TODO: bg colour later
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader->use();
 
