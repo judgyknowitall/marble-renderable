@@ -99,7 +99,7 @@ void main()
     orennayar(FragPos, Normal, Diffuse, Specular);
 
     // TESTS
-    FragColor = vec4( Diffuse, 1.0 );	// albedo
+    //FragColor = vec4( Diffuse, 1.0 );	// albedo
     //FragColor = vec4(Specular, Specular, Specular, 1.0);	// roughness
     //FragColor = vec4(FragPos, 1.0);	// TEST COORDS
     //FragColor = vec4(Normal, 1.0);	    // view normal
