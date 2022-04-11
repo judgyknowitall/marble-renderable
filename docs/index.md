@@ -1,32 +1,58 @@
-## Welcome to GitHub Pages
+# Marble Rendering
 
-You can use the [editor on GitHub](https://github.com/judgyknowitall/marble-renderable/edit/main/docs/index.md) to maintain and preview the content for your website in Markdown files.
+- *By: Zahra Ghavasieh*
+- *Created in: April 2022*
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+This project aims to create a customizable marble texture in a real-time setting. It will make use of Perlin Noise to create a procedurally generated texture, the Schlick Fresnel Approximation to add reflections, and a subsurface scattering approximation technique to add more realism to this material.
 
-### Markdown
+---
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Project Plan
 
-```markdown
-Syntax highlighted code block
+![Project-plan](https://github.com/judgyknowitall/marble-renderable/blob/main/docs/pics/plan.png)
 
-# Header 1
-## Header 2
-### Header 3
+During the month of April, this project was created for the CPSC591-Rendering course while completing my degree at the University of Calgary. 
+This project consisted of five main stages:
 
-- Bulleted
-- List
+1. Skeleton and Environment Setup
+    - OpenGL window, shaders, buffers
+    - Object Model Loading
 
-1. Numbered
-2. List
+2. Procedural Text Generation
+    - Perlin Noise
+    - Texture UV Mapping
 
-**Bold** and _Italic_ and `Code` text
+3. Subsurface Scattering Approximation
+    - Nvidia's Depth Map approach
 
-[Link](url) and ![Image](src)
-```
+4. Reflection Approximation
+    - Schlick Fresnel Approximation
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+5. Tunings and Interactability
+    - Changing Parameters 
+    - Changing model
+
+---
+
+## Pipeline
+
+![Project-pipeline](https://github.com/judgyknowitall/marble-renderable/blob/main/docs/pics/pipeline.png)
+
+Using OpenGL, a deferred shading pipeline was implemented. Upon loading an object mesh, the marble texture is procedurally generated and stored in a vector.
+Then, in the main loop, it is passed on to the Geometry shaders which will then create the fragment colours.
+For the Subsurface Scattering (SSS) Approximation, the first pass will be to create the Depth map, which is also passed on to the Geometry shaders to simulate SSS.
+Finally, all shading and reflections are done in the Lighting Pass. 
+
+Therefore, this pipeline consists of three passes as shown above.
+
+---
+
+## Texture Generation
+
+ *-- WIP --*
+
+
+---
 
 ### Jekyll Themes
 

@@ -20,8 +20,8 @@ void main()
     gNormal = normalize(Normal);
 
     gColor = texture(marbleTexture, TexCoord);
-    vec4 color = vec4(.88f, 0.775, 0.61, 1.f);
-    gColor = 1 - (1-gColor.r) * (1-color);
+    //vec4 color = vec4(.88f, 0.775, 0.61, 1.f);
+    //gColor = 1 - (1-gColor.r) * (1-color);
     // Create Marble Color from generated texture
     //vec4 stripes = vec4(236/256, 202/256, 164/256, 1.f);
     vec4 stripes = vec4(.1, .1, .1, 1);

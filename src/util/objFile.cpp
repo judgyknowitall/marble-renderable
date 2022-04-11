@@ -192,8 +192,8 @@ float MarbleTexture(float x, float y) {
 	
 	//xPeriod and yPeriod together define the angle of the lines
 	//xPeriod and yPeriod both 0 ==> it becomes a normal clouds or turbulence pattern
-	float xPeriod = 3.0; //defines repetition of marble lines in x direction
-	float yPeriod = 5.0; //defines repetition of marble lines in y direction
+	float xPeriod = 0; //defines repetition of marble lines in x direction
+	float yPeriod = 0; //defines repetition of marble lines in y direction
 	//turbPower = 0 ==> it becomes a normal sine pattern
 	float turbPower = 5.0; //makes twists
 	float turbSize = 32.0; //initial size of the turbulence
