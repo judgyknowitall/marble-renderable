@@ -37,7 +37,7 @@ using namespace glm;
 int main(int argc, char **argv)
 {
     // Setup object
-    ObjFile* obj = new ObjFile("models/cube.obj");
+    ObjFile* obj = new ObjFile("models/dragon.obj");
     State* state = new State();
 
     // Set up Graphics
