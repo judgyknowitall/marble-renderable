@@ -13,8 +13,8 @@
 #include <string>
 #include <iostream>
 
-#define MARBLE_TEX_WIDTH 10
-#define MARBLE_TEX_HEIGHT 10
+#define MARBLE_TEX_WIDTH 100
+#define MARBLE_TEX_HEIGHT 100
 
 
 using namespace std;
@@ -136,9 +136,18 @@ void ObjFile::calculateNormals() {
 // Generate Marble Texture
 ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#define noiseWidth 320
-#define noiseHeight 240
+#define noiseWidth 128
+#define noiseHeight 128
 float noise[noiseHeight][noiseWidth];
+
+void generateNoise()
+{
+	for (int y = 0; y < noiseHeight; y++)
+		for (int x = 0; x < noiseWidth; x++)
+		{
+			noise[y][x] = (rand() % 32768) / 32768.0;
+		}
+}
 
 float smoothNoise(float x, float y)
 {
@@ -180,6 +189,7 @@ float turbulence(float x, float y, float size)
 
 
 float MarbleTexture(float x, float y) {
+	
 	//xPeriod and yPeriod together define the angle of the lines
 	//xPeriod and yPeriod both 0 ==> it becomes a normal clouds or turbulence pattern
 	float xPeriod = 5.0; //defines repetition of marble lines in x direction
@@ -188,8 +198,8 @@ float MarbleTexture(float x, float y) {
 	float turbPower = 5.0; //makes twists
 	float turbSize = 32.0; //initial size of the turbulence
 
-	//float xyValue = x * xPeriod / noiseWidth + y * yPeriod / noiseHeight + turbPower * turbulence(x, y, turbSize) / 256.0;
-	float xyValue = x * xPeriod / noiseWidth + y * yPeriod / noiseHeight;
+	float xyValue = x * xPeriod / noiseWidth + y * yPeriod / noiseHeight + turbPower * turbulence(x, y, turbSize) / 256.0;
+	//float xyValue = x * xPeriod / noiseWidth + y * yPeriod / noiseHeight;
 	float c = abs(sin(xyValue * 3.14159));
 
 	return c;
@@ -203,13 +213,12 @@ void ObjFile::calculateColors() {
 	textureCoords.clear();
 	
 	// Create Texture
+	generateNoise();
 	for (float s = 0; s < MARBLE_TEX_WIDTH; s++) {
 		for (float t = 0; t < MARBLE_TEX_HEIGHT; t++) {
-			//float c = MarbleTexture(s,t);	// Basic sine function
+			float c = MarbleTexture(s,t);	// Basic sine function
 			//cout << c << endl;
-			//marbleNoise.push_back(vec3(c,c,c));
-			marbleNoise.push_back(vec3(s / MARBLE_TEX_WIDTH, .5f, 0.f));
-			cout << s / MARBLE_TEX_WIDTH << endl;
+			marbleNoise.push_back(vec3(c,c,c));
 		}
 	}
 
@@ -218,8 +227,6 @@ void ObjFile::calculateColors() {
 		textureCoords.push_back(vec2(vertex.x, vertex.z));
 		//cout << vertex.x << ',' << vertex.y << ',' << vertex.z << endl;
 	}
-
-	cout << vertices.size() << ',' << marbleNoise.size() << endl;
 }
 
 

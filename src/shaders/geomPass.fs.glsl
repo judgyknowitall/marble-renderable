@@ -9,7 +9,6 @@ layout(location = 2) out vec3 gPosition;
 //in vec2 TexCoords;
 in vec3 FragPos;
 in vec3 Normal;
-//in vec4 Color;
 in vec2 TexCoord;
 
 uniform sampler2D marbleTexture;
