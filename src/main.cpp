@@ -75,9 +75,13 @@ int main(int argc, char **argv)
                 }
                 obj->setupObj();
             }
+
+            // Clear frame
+            glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
             // Render each pass
-            //depthPass.render(window->width, window->height);
+            depthPass.render(window->width, window->height);
             geomPass.render(window->width, window->height);
             lightPass.render();
 

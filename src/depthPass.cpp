@@ -24,7 +24,6 @@ DepthPass::DepthPass(ObjFile* o, State* s) : obj(o), state(s) {
 	// Configure Global opengl State
 	glClearColor(0.f, 0.f, 0.f, 1.f);
 	glEnable(GL_DEPTH_TEST);
-	/*
 	glEnable(GL_SMOOTH);
 	glEnable(GL_TEXTURE_2D);
 	glEnable(GL_CULL_FACE);
@@ -35,7 +34,6 @@ DepthPass::DepthPass(ObjFile* o, State* s) : obj(o), state(s) {
 
 	glShadeModel(GL_SMOOTH);
 	glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
-	*/
 
 
 	// Set up draw buffer
@@ -71,16 +69,11 @@ void DepthPass::generateTexture() {
 
 
 void DepthPass::render(unsigned int windowWidth, unsigned int windowHeight) {
-
-	glClearColor(0.f, 0.f, 0.f, 1.f);
-	glEnable(GL_DEPTH_TEST);
-
-	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+	
 	BindBuffer();
+	glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	shader->use();
-
-	// Configure shader and matrices
 	
 	// Orthographic Projection MAtrix
 	mat4 lightProjection = ortho(-10.f, 10.f, -10.f, 10.f, -5.f, 10.f);

@@ -119,7 +119,7 @@ void main()
     vec3 Diffuse = texture(gColor, TexCoords).rgb;
     float Specular = texture(gColor, TexCoords).a;
     float sss_depth = texture(depthMap, TexCoords).x;
-    sss_depth = linearizeDepth(sss_depth) / far_plane;
+    //sss_depth = linearizeDepth(sss_depth) / far_plane;
 
     // Render
     switch(render_mode) {

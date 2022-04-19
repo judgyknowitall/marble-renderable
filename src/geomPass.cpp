@@ -114,14 +114,10 @@ void GeomPass::render(int width, int height) {
 void GeomPass::BindGBuffer()
 {
     glBindFramebuffer(GL_FRAMEBUFFER, gBuffer);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
 }
 
 void GeomPass::UnBindGBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
 }
 
 
