@@ -19,7 +19,8 @@ void main()
     gPosition = FragPos;
     gNormal = normalize(Normal);
 
-    gColor = texture(marbleTexture, TexCoord);
+    float marble_c = texture(marbleTexture, TexCoord).r;
+    gColor.rgb = vec3(marble_c);
     //vec4 color = vec4(.88f, 0.775, 0.61, 1.f);
     //gColor = 1 - (1-gColor.r) * (1-color);
     // Create Marble Color from generated texture

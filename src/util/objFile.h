@@ -57,7 +57,7 @@ class ObjFile {
 
 		// Marble Texture
 		GLuint marbleTexture = NULL;	// OpenGL Texture
-		vector<vec3> marbleNoise;		// Generated image
+		vector<float> marbleNoise;		// Generated image
 		vector<vec2> textureCoords;
 
 		vec3 max, min;

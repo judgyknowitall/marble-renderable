@@ -218,7 +218,7 @@ void ObjFile::calculateColors() {
 		for (float t = 0; t < MARBLE_TEX_HEIGHT; t++) {
 			float c = MarbleTexture(s,t);	// Basic sine function
 			//cout << c << endl;
-			marbleNoise.push_back(vec3(c,c,c));
+			marbleNoise.push_back(c);
 		}
 	}
 
@@ -285,7 +285,7 @@ void ObjFile::bufferData() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, MARBLE_TEX_WIDTH, MARBLE_TEX_HEIGHT, 0, GL_RGB, GL_FLOAT, &marbleNoise[0]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_R16F, MARBLE_TEX_WIDTH, MARBLE_TEX_HEIGHT, 0, GL_RED, GL_FLOAT, &marbleNoise[0]);
 }
 
 

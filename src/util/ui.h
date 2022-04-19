@@ -17,7 +17,6 @@ private:
 
 public:
 
-	bool showPanel = true;
 	bool loadObj = false;
 
 	// obj file
@@ -53,19 +52,7 @@ public:
 		NewFrame();
 
 		// Create panel
-		if (showPanel && Begin("Panel", &showPanel, ImGuiWindowFlags_MenuBar)) {
-
-			if (BeginMenuBar()) {
-				if (BeginMenu("File")) {
-					if (MenuItem("Close", "(P)")) {
-						showPanel = false;
-					}
-					ImGui::EndMenu();
-				}
-				EndMenuBar();
-			}
-
-			Spacing();
+		if (state->show_panel && Begin("Panel", &state->show_panel, ImGuiWindowFlags_MenuBar)) {
 
 			// Load Object
 			if (CollapsingHeader("OBJ Loader")) {
