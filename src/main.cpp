@@ -23,6 +23,7 @@
 #include "util/objFile.h"
 #include "util/ui.h"
 #include "state.h"
+#include "depthPass.h"
 #include "geomPass.h"
 #include "lightPass.h"
 
@@ -42,11 +43,12 @@ int main(int argc, char **argv)
 
     // Set up Graphics
     MyWindow* window = new MyWindow(obj, state);
-    UI ui(window->getWindow());    // imgui
-
+    UI ui(window->getWindow(), state);    // imgui
+    
     // Create Rendering Passes
-    GeomPass geomPass(obj);
-    LightPass lightPass(&geomPass.texMaps, &geomPass.texNames);
+    DepthPass depthPass(obj, state);
+    GeomPass geomPass(obj, state);
+    LightPass lightPass(&geomPass.texMaps, &geomPass.texNames, depthPass.depthMapTex, state);
 
     // Finish setting up obj
     if (obj->numVertices() == 0) {
@@ -75,8 +77,9 @@ int main(int argc, char **argv)
             }
         
             // Render each pass
+            //depthPass.render(window->width, window->height);
             geomPass.render(window->width, window->height);
-            lightPass.render(state->light_rotate);
+            lightPass.render();
 
             ui.draw();
         

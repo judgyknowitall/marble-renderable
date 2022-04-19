@@ -15,8 +15,8 @@ using namespace glm;
 
 
 // Constructor: create shaderprogram
-LightPass::LightPass(vector<GLuint>* tMaps, vector<string>* tNames) :
-    texMaps(tMaps), texNames(tNames) 
+LightPass::LightPass(vector<GLuint>* tMaps, vector<string>* tNames, GLuint depthTex, State* s) :
+    texMaps(tMaps), texNames(tNames), depthMap(depthTex), state(s)
 {
     shader = new Shader(VS_FILE, FS_FILE);
 }
@@ -27,20 +27,21 @@ LightPass::LightPass(vector<GLuint>* tMaps, vector<string>* tNames) :
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void LightPass::render(mat4 light_rotate) {
+void LightPass::render() {
 
     glClearColor(0.2f, 0.f, 0.f, 1.f); //TODO: bg colour later
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader->use();
 
     // Light Position
-    vec4 L = light_rotate * vec4(0.7071067811865475, 0, 0.7071067811865475, 1);
-    float scale = sqrt(L.x * L.x + L.y * L.y + L.z * L.z);
-    shader->setVec3("L", vec3(L.x / scale, L.y / scale, L.z / scale));
+    shader->setVec3("L", state->getLightPos());
     
     // View Position
     vec3 view = vec3(VIEW_POS_X, VIEW_POS_Y, VIEW_POS_Z);
     shader->setVec3("V", view);
+
+    // Render Mode
+    shader->setInt("render_mode", state->render_mode);
 
     // AttachTextures
     AttachTextures();
@@ -50,11 +51,21 @@ void LightPass::render(mat4 light_rotate) {
 }
 
 void LightPass::AttachTextures() {
-    for (int i = 0; i < texMaps->size(); i++) {
+
+    int i = 0;
+
+    // GBuffer
+    while (i < texMaps->size()) {
         shader->setInt(texNames->at(i), i);
         glActiveTexture(GL_TEXTURE0 + i);
         glBindTexture(GL_TEXTURE_2D, texMaps->at(i));
+        i++;
     }
+
+    // Depth Map
+    shader->setInt("depthMap", i);
+    glActiveTexture(GL_TEXTURE0 + i);
+    glBindTexture(GL_TEXTURE_2D, depthMap);
 }
 
 

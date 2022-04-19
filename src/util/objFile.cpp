@@ -350,6 +350,12 @@ mat4 ObjFile::getFitTranslate () {
 	return translate (mat4(1.0f), -center);
 }
 
+
+void ObjFile::calculateScale() {
+	xform.scaling = scale(mat4(1.0f), vec3(xform.scalar)) * xform.scaling;
+}
+
+
 mat4 ObjFile::getTransformation() {
 	return xform.rotation * xform.scaling * xform.translation;
 }

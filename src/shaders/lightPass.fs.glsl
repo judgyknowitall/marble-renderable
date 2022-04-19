@@ -1,10 +1,13 @@
 #version 410 core
 
+
 #define PI 3.1415926538
+
 
 out vec4 FragColor;
 
 in vec2 TexCoords;
+
 
 // Input from gBuffer
 uniform sampler2D gDepth;
@@ -12,14 +15,22 @@ uniform sampler2D gColor;
 uniform sampler2D gNormal;
 uniform sampler2D gPosition;
 
+// Shadow Map
+uniform sampler2D depthMap;
+
 
 // Uniforms
 uniform vec3 L;     // Light Position
 uniform vec3 V;     // View Position
 
+uniform int render_mode = 2;
+
 uniform vec4 bg = vec4(0.2, 0.1, 0, 1);         // the background colour
 uniform vec3 ambient = vec3(0.1, 0.07, 0.03);   // Ambient Light
 
+
+uniform float near_plane = -5.f;
+uniform float far_plane = 10.f;
 
 
 
@@ -76,8 +87,21 @@ void orennayar(vec3 FragPos, vec3 Normal, vec3 Diffuse, float Specular) {
 
 
 /////////////////////////////////////////////////////////////////////
+// Linearize Proj
+/////////////////////////////////////////////////////////////////////
+
+// required when using a perspective projection matrix
+float linearizeDepth(float depth)
+{
+    float z = depth * 2.0 - 1.0; // Back to NDC 
+    return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));	
+}
+
+
+/////////////////////////////////////////////////////////////////////
 // MAIN
 /////////////////////////////////////////////////////////////////////
+
 
 void main()
 {
@@ -94,18 +118,46 @@ void main()
     vec3 Normal = texture(gNormal, TexCoords).xyz;
     vec3 Diffuse = texture(gColor, TexCoords).rgb;
     float Specular = texture(gColor, TexCoords).a;
+    float sss_depth = texture(depthMap, TexCoords).x;
+    sss_depth = linearizeDepth(sss_depth) / far_plane;
 
-    //phong(FragPos, Normal, Diffuse, Specular);
-    orennayar(FragPos, Normal, Diffuse, Specular);
+    // Render
+    switch(render_mode) {
+    
+    case 0: // Phong
+        phong(FragPos, Normal, Diffuse, Specular);
+        break;
 
-    // TESTS
-    FragColor = vec4( Diffuse, 1.0 );	// albedo
-    //FragColor = vec4(Specular, Specular, Specular, 1.0);	// roughness
-    //FragColor = vec4(FragPos, 1.0);	// TEST COORDS
-    //FragColor = vec4(Normal, 1.0);	    // view normal
-    //FragColor = vec4(TexCoords, 0.0, 1.0);		// screen space
+    case 1: // Oren-Nayar
+        orennayar(FragPos, Normal, Diffuse, Specular);
+        break;
 
-    float d2 = depth * depth;
-    float d4 = depth * depth;
-    //FragColor = vec4(d4 * d4, d4, depth, 1.0);	// depth value
+    case 2: // Albedo
+        FragColor = vec4( Diffuse, 1.0 );
+        break;
+
+    case 3: // Specular
+        FragColor = vec4(Specular, Specular, Specular, 1.0);
+        break;
+
+    case 4: // Depth Map
+        FragColor = vec4(vec3(sss_depth), 1.0);
+        break;
+
+    case 5:  // Position
+        FragColor = vec4(FragPos, 1.0);
+        break;
+    
+    case 6:  // Normal
+        FragColor = vec4(Normal, 1.0);
+        break;
+    
+    case 7:  // Depth
+        float d2 = depth * depth;
+        FragColor = vec4(d2 * d2, d2, depth, 1.0);
+        break;
+
+    default: // screen space
+        FragColor = vec4(TexCoords, 0.0, 1.0);		
+    }
 }

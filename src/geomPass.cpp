@@ -6,9 +6,6 @@
 #define VS_FILE "shaders/geomPass.vs.glsl"
 #define FS_FILE "shaders/geomPass.fs.glsl"
 
-//#define VS_FILE "shaders/phong.vs.glsl"
-//#define FS_FILE "shaders/phong.fs.glsl"
-
 
 
 using namespace std;
@@ -19,24 +16,8 @@ using namespace std;
 
 
 // Constructor: create shaderprogram
-GeomPass::GeomPass(ObjFile* o) : obj(o) {
+GeomPass::GeomPass(ObjFile* o, State* s) : obj(o) {
 	
-    // Configure Global opengl State
-    glClearColor(0.f, 0.f, 0.f, 1.f);
-    glEnable(GL_DEPTH_TEST);
-    /*
-    glEnable(GL_SMOOTH);
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_CULL_FACE);
-
-    glDisable(GL_LIGHTING);
-    glDisable(GL_FOG);
-    glDisable(GL_RESCALE_NORMAL);
-
-    glShadeModel(GL_SMOOTH);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_DONT_CARE);
-    */
-
     // set up the draw buffers
     glGenFramebuffers(1, &gBuffer);
 
@@ -45,6 +26,7 @@ GeomPass::GeomPass(ObjFile* o) : obj(o) {
     shader->use();
     shader->setInt("position", 0);
     shader->setInt("normal", 1);
+    shader->setInt("texCoord", 2);
 }
 
 
@@ -105,17 +87,16 @@ void GeomPass::render(int width, int height) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader->use();
 
-    // Scale based on input
-    obj->xform.scaling = scale(mat4(1.0f), vec3(obj->xform.scalar)) * obj->xform.scaling;
+    // Object Transformation matrix
     mat4 model = obj->getTransformation();
     shader->setMat4("model", model);
 
     // Create and pass view matrix
-    mat4 view = lookAt(vec3(VIEW_POS_X, VIEW_POS_Y, VIEW_POS_Z), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+    mat4 view = lookAt(vec3(VIEW_POS_X, VIEW_POS_Y, VIEW_POS_Z), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
     shader->setMat4("view", view);
    
-    //Create and pass projection matrix
-    mat4 proj = perspective(45.0f, (float)width / (float)height, 0.1f, 100.0f);
+    // Create and pass projection matrix
+    mat4 proj = perspective(45.0f, (float)width / (float)height, 0.1f, 100.f);
     shader->setMat4("projection", proj);
 
     // Marble Texture

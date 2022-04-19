@@ -105,11 +105,13 @@ void MyWindow::key_callback(int key, int scancode, int action, int mods)
         case GLFW_KEY_Z:
             if (action == GLFW_RELEASE) obj->xform.scalar = 1.0f; 
             else obj->xform.scalar = 1.01f;
+            obj->calculateScale();
             break;
 
         case GLFW_KEY_X:
             if (action == GLFW_RELEASE) obj->xform.scalar = 1.0f;
             else obj->xform.scalar = 1.0f / 1.01f;
+            obj->calculateScale();
             break;
 
         // move around the light

@@ -43,6 +43,7 @@ class ObjFile {
 		vec4 getVertex (int i);
 		vec3 getNormal (int i);
 
+		void calculateScale();
 		mat4 getTransformation();
 		
 

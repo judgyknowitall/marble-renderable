@@ -16,21 +16,24 @@
 #include "state.h"
 
 
-// Shading
-class LightPass {
+// Depth Map
+class DepthPass {
 public:
 
-	LightPass(std::vector<GLuint>* texMaps, std::vector<std::string>* texNames, GLuint depthTex, State* state);
-	void render();
-	void renderQuad();
-	void AttachTextures();
+	DepthPass(ObjFile* o, State* s);
+	void render(unsigned int windowWidth, unsigned int windowHeight);
+
+	GLuint depthMapTex = NULL;	// depth Texture
 
 private:
 
 	State* state;
 	Shader* shader;
-	GLuint depthMap;
-	std::vector<GLuint>* texMaps; 
-	std::vector<std::string>* texNames;
-	GLuint quadVBO = 0, quadVAO = 0;
+	ObjFile* obj;
+	GLuint depthMapFBO;	// Frame Buffer
+
+	void generateTexture();
+	void BindBuffer();
+	void UnBindBuffer();
+	void BindTexture();
 };

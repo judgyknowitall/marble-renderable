@@ -13,13 +13,14 @@
 #include "util/shader.h"
 #include "util/objFile.h"
 #include "util/ui.h"
+#include "state.h"
 
-// 1st Pass
+
 // Geometry
 class GeomPass {
 public:
 
-	GeomPass(ObjFile* o);
+	GeomPass(ObjFile* o, State* s);
 	void generateTextures(unsigned int WindowWidth, unsigned int WindowHeight);
 	bool shaderGenerated() { return shader->isGenerated(); }
 	void render(int width, int height);
@@ -32,6 +33,7 @@ public:
 private:
 
 	Shader* shader;
+	State* state;
 	ObjFile* obj;
 
 	GLuint gBuffer;
