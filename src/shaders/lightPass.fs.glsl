@@ -153,12 +153,10 @@ void main()
     
     case 0: // Phong
         phong(FragPos, Normal, Diffuse, Specular);
-        FragColor = sss_value * FragColor;
         break;
 
     case 1: // Oren-Nayar
         orennayar(FragPos, Normal, Diffuse, Specular);
-        FragColor = sss_value * FragColor;
         break;
 
     case 2:     // Subsurface Scattering
