@@ -73,7 +73,8 @@ public:
 			// Colours
 			if (CollapsingHeader("Colours")) {
 				//static float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-				ColorEdit3("color", &state->background_colour.r);
+				ColorEdit3("Background", &state->background_colour.r);
+				ColorEdit3("Marble Base", &state->marble_base_colour.r);
 			}
 
 			Spacing();
@@ -82,15 +83,17 @@ public:
 			if (CollapsingHeader("Parameters")) {
 				SliderFloat("SSS", &state->k_sss, 0.0f, 1.0f);
 				SliderFloat("Schlick", &state->k_schlick, 0.0f, 1.0f);
+				Checkbox("SSS First", &state->sss_first);
 			}
 
 			Spacing();
 
 			// Rendering Options
 			std::vector<const char*> options = {
-				"OrenNayar", "MarbleRendering", "Subsurface Scattering", "Schlick",
-				"Albedo", "Specular", "Depth Map",
-				 "Position", "Normal", "Depth", "Screen Space"};
+				"Phong", "OrenNayar", "MarbleRendering", 
+				"Subsurface Scattering", "Schlick Reflectance",
+				"Albedo", "Shadow Map", "Depth",
+				"Position", "Normal", "Screen Space"};
 			static const char* current_item = options[state->render_mode];
 			if (BeginCombo("Render Type", current_item)) // The second parameter is the label previewed before opening the combo.
 			{

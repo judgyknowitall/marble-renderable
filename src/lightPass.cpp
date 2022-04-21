@@ -46,6 +46,7 @@ void LightPass::render() {
     shader->setVec4("bg", bg);
     shader->setFloat("sigma_t", state->k_sss);
     shader->setFloat("k_schlick", state->k_schlick);
+    shader->setBool("sss_first", state->sss_first);
 
     // AttachTextures
     AttachTextures();

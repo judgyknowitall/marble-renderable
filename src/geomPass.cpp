@@ -110,6 +110,9 @@ void GeomPass::render(int width, int height) {
     mat4 lightSpace = state->getLightSpaceMatrix();
     shader->setMat4("lightSpace", lightSpace);
 
+    // Marble Colours
+    shader->setVec3("marble_base_clr", state->marble_base_colour);
+
     // Marble Texture
     shader->setInt("marbleTexture", 0);
     glActiveTexture(GL_TEXTURE0);

@@ -18,17 +18,19 @@ class State {
 private:
 
 	// allow the light to be rotated
-	glm::vec4 light = //glm::vec4(0.7071067811865475, 0, 0.7071067811865475, 1);
-		glm::vec4(20.f,0.f,20.f,1.f);
+	glm::vec4 light = glm::vec4(0.7071067811865475, 0, 0.7071067811865475, 1);
+		//glm::vec4(1.f,1.f,1.f,1.f);
 	glm::mat4 light_rotate = glm::mat4(1.0);
 
 public:
 
-	int render_mode = 1;
+	int render_mode = 2;
 	bool show_panel = true;
+	bool sss_first = false;
 
 	// Colours
 	glm::vec4 background_colour = glm::vec4(0.2, 0.1, 0, 1);
+	glm::vec4 marble_base_colour = glm::vec4(.88f, 0.775, 0.61, 1.f);
 
 	// Parameters
 	float k_sss = 0.5f;
@@ -40,9 +42,13 @@ public:
 		light_rotate = glm::rotate(glm::mat4(1.0f), amount, axis) * light_rotate;
 	}
 
+	void scale_light(float amount) {
+		light = glm::scale(glm::mat4(1.0f), glm::vec3(amount)) * light;
+	}
+
 	glm::vec3 getLightPos() {
 		glm::vec3 L = glm::vec3(light_rotate * light);
-		if (glm::length(L) != 0) L = glm::normalize(L);
+		//if (glm::length(L) != 0) L = glm::normalize(L);
 		return L;
 	}
 

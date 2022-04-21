@@ -131,6 +131,14 @@ void MyWindow::key_callback(int key, int scancode, int action, int mods)
             state->rotate_light(vec3(0.0f, 1.0f, 0.0f), 0.1f);
             break;
 
+        case GLFW_KEY_KP_7:
+            state->scale_light(1.1f);
+            break;
+
+        case GLFW_KEY_KP_9:
+            state->scale_light(0.9f);
+            break;
+
         // Panel
         case GLFW_KEY_P:
             if (action == GLFW_RELEASE) 

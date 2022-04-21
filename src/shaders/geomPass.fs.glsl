@@ -13,7 +13,7 @@ in vec3 Normal;
 in vec2 TexCoord;
 
 uniform sampler2D marbleTexture;
-
+uniform vec3 marble_base_clr;
 
 
 void main()
@@ -23,22 +23,16 @@ void main()
     gPosition = FragPos;
     gNormal = normalize(Normal);
 
-    float marble_c = texture(marbleTexture, TexCoord).r;
-    //gColor.rgb = vec3(marble_c);
+    float marble_tex = texture(marbleTexture, TexCoord).r;
+    //gColor.rgb = vec3(marble_tex);              // Just B&W texture
 
-    vec4 color = vec4(.88f, 0.775, 0.61, 1.f);
-    gColor = 1 - (1-marble_c) * (1-color);      // Adjust Transparency
+    gColor.rgb = 1 - (1-marble_tex) * (1-marble_base_clr);      // Adjust Transparency
     // Create Marble Color from generated texture
     //vec4 stripes = vec4(236/256, 202/256, 164/256, 1.f);
     vec4 stripes = vec4(.1, .1, .1, 1);
-    
-    //gColor += color;
-    //gColor = 1 - (1-gColor) * (1-color);
 
     //gColor *= vec4(0.98, 0.977, 0.926,1.f);
     gColor.a = 0;
-    
-    //gColor = gColor * color;
 }
 
 

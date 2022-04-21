@@ -25,6 +25,7 @@ uniform vec3 L;     // Light Position
 uniform vec3 V;     // View Position
 
 uniform int render_mode = 2;
+uniform bool sss_first = false;
 
 uniform vec4 bg = vec4(0.2, 0.1, 0, 1);         // the background colour
 uniform vec3 ambient = vec3(0.1, 0.07, 0.03);   // Ambient Light
@@ -88,22 +89,6 @@ void orennayar(vec3 FragPos, vec3 Normal, vec3 Diffuse, float Specular) {
 }
 
 
-
-/////////////////////////////////////////////////////////////////////
-// Linearize Proj
-/////////////////////////////////////////////////////////////////////
-
-// required when using a perspective projection matrix
-float linearizeDepth(float depth)
-{
-    //float z = depth * 2.0 - 1.0; // Back to NDC 
-    float z = depth;
-    float new_depth = (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));	
-    //return (new_depth + 1)/ 2;
-    return new_depth;
-}
-
-
 /////////////////////////////////////////////////////////////////////
 // Fresnel Schlick Reflection Approximation
 /////////////////////////////////////////////////////////////////////
@@ -136,7 +121,7 @@ void main()
 
     // check if we're a background pixel ASAP to save on computing
     float depth = texture(gDepth, TexCoords).x;
-    if (depth == 1 && render_mode != 4) {
+    if (depth == 1 && render_mode != 6) {
         FragColor = bg;
         return;
     }
@@ -148,7 +133,6 @@ void main()
     vec3 Diffuse = texture(gColor, TexCoords).rgb;
     float Specular = texture(gColor, TexCoords).a;
     float sss_depth = texture(depthMap, TexCoords).x;
-    //sss_depth = linearizeDepth(sss_depth) / far_plane;
 
     // SSS values
     float si = FragPos.z - LightPos.z;
@@ -157,48 +141,54 @@ void main()
     // Render
     switch(render_mode) {
 
-    case 0:     // Oren-Nayar
+    case 0:     // Phong
+        phong(FragPos, Normal, Diffuse, Specular);
+        break;
+
+
+    case 1:     // Oren-Nayar
         orennayar(FragPos, Normal, Diffuse, Specular);
         break;
 
-    case 1:     // Marble Rendering
-        //Diffuse = vec3(1.0,0,0);
-        vec3 sss_color = sss_value * Diffuse; // SSS
-        FragColor = vec4(fresnelSchlick(Normal, FragPos, sss_color),1.0); // Reflection
+    case 2:     // Marble Rendering
+        if (sss_first) {
+            vec3 sss_color = sss_value * Diffuse; // SSS
+            FragColor = vec4(fresnelSchlick(Normal, FragPos, sss_color),1.0); // Reflection
+        }
+        else {
+            vec3 refl = fresnelSchlick(Normal, FragPos, Diffuse);
+            FragColor = vec4(sss_value * refl, 1.0);
+        }
         break;
 
-    case 2:     // Subsurface Scattering
+    case 3:     // Subsurface Scattering
         FragColor = vec4(sss_value * Diffuse, 1.0);
         break;
 
-    case 3:     // Reflection
+    case 4:     // Reflection
         Diffuse = vec3(.1f, 0.1, 0.1);
         FragColor = vec4(fresnelSchlick(Normal, FragPos, Diffuse),1.0);
         break;
 
-    case 4:     // Albedo
+    case 5:     // Albedo
         FragColor = vec4( Diffuse, 1.0 );
         break;
 
-    case 5:     // Specular
-        FragColor = vec4(Specular, Specular, Specular, 1.0);
+    case 6:     // Shadow Map
+        FragColor = vec4(vec3(LightPos.z), 1.0);
         break;
 
-    case 6:     // Depth Map
-        FragColor = vec4(vec3(sss_depth), 1.0);
+    case 7:     // Depth
+        float d2 = depth + depth;
+        FragColor = vec4(d2 * d2, d2, depth, 1.0);
         break;
 
-    case 7:     // Position
+    case 8:     // Position
         FragColor = vec4(FragPos, 1.0);
         break;
     
-    case 8:     // Normal
+    case 9:     // Normal
         FragColor = vec4(Normal, 1.0);
-        break;
-    
-    case 9:     // Depth
-        float d2 = depth * depth;
-        FragColor = vec4(d2 * d2, d2, depth, 1.0);
         break;
 
     default:    // screen space
