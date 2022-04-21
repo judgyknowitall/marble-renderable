@@ -34,7 +34,7 @@ uniform float near_plane = -5.f;
 uniform float far_plane = 10.f;
 uniform float sigma_t = 0.3f;
 
-uniform vec3 k_schlick = vec3(0.04);
+uniform float k_schlick = 1.0;
 
 
 /////////////////////////////////////////////////////////////////////
@@ -109,13 +109,20 @@ float linearizeDepth(float depth)
 /////////////////////////////////////////////////////////////////////
 
 
-vec3 fresnelSchlick(vec3 Normal, vec3 Diffuse)
+vec3 fresnelSchlick(vec3 Normal, vec3 FragPos, vec3 Diffuse)
 {
-    //vec3 F0 = k_schlick * Diffuse;
-    //float cosTheta = max(dot(Normal, V), 0);
-    //return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
-    float NdotL = max( 0, dot( Normal, L ) );
-    return Diffuse + ( 1 - Diffuse ) * pow( ( 1 - NdotL ), 5 );
+    vec3 V_n = normalize(FragPos);
+    vec3 L_n = L;
+    vec3 H = normalize(V_n + L_n);
+    float cosTheta = max(0, dot(H,Normal));
+    vec3 F0 = vec3(0.04);
+    F0 = mix(F0, Diffuse, 0.1); // metalness = 0
+
+    //float cosTheta = max( 0, dot( Normal, L ) );
+    vec3 schlick = F0 + ( 1 - F0 ) * pow( 1 - cosTheta , 5 );
+
+    //Y = 255 - P*(255-X) // P = opacity
+    return Diffuse - k_schlick * (1-schlick);
 }
 
 
@@ -146,17 +153,18 @@ void main()
     // SSS values
     float si = FragPos.z - LightPos.z;
     float sss_value = exp(-si * sigma_t);
-    //Diffuse = vec3(1.0,0,0);
 
     // Render
     switch(render_mode) {
-    
-    case 0: // Phong
-        phong(FragPos, Normal, Diffuse, Specular);
+
+    case 0:     // Oren-Nayar
+        orennayar(FragPos, Normal, Diffuse, Specular);
         break;
 
-    case 1: // Oren-Nayar
-        orennayar(FragPos, Normal, Diffuse, Specular);
+    case 1:     // Marble Rendering
+        //Diffuse = vec3(1.0,0,0);
+        vec3 sss_color = sss_value * Diffuse; // SSS
+        FragColor = vec4(fresnelSchlick(Normal, FragPos, sss_color),1.0); // Reflection
         break;
 
     case 2:     // Subsurface Scattering
@@ -165,18 +173,18 @@ void main()
 
     case 3:     // Reflection
         Diffuse = vec3(.1f, 0.1, 0.1);
-        FragColor = vec4(fresnelSchlick(Normal, Diffuse),1.0);
+        FragColor = vec4(fresnelSchlick(Normal, FragPos, Diffuse),1.0);
         break;
 
-    case 4: // Albedo
+    case 4:     // Albedo
         FragColor = vec4( Diffuse, 1.0 );
         break;
 
-    case 5: // Specular
+    case 5:     // Specular
         FragColor = vec4(Specular, Specular, Specular, 1.0);
         break;
 
-    case 6: // Depth Map
+    case 6:     // Depth Map
         FragColor = vec4(vec3(sss_depth), 1.0);
         break;
 

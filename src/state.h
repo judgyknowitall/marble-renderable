@@ -18,20 +18,21 @@ class State {
 private:
 
 	// allow the light to be rotated
-	glm::vec4 light = glm::vec4(0.7071067811865475, 0, 0.7071067811865475, 1);
+	glm::vec4 light = //glm::vec4(0.7071067811865475, 0, 0.7071067811865475, 1);
+		glm::vec4(20.f,0.f,20.f,1.f);
 	glm::mat4 light_rotate = glm::mat4(1.0);
 
 public:
 
-	int render_mode = 3;
+	int render_mode = 1;
 	bool show_panel = true;
 
 	// Colours
 	glm::vec4 background_colour = glm::vec4(0.2, 0.1, 0, 1);
 
 	// Parameters
-	float k_sss = 0.3f;
-	glm::vec3 k_schlick = glm::vec3(0.04);
+	float k_sss = 0.5f;
+	float k_schlick = 0.5f;
 
 	// Methods //////////////////////////////////////////////////////////////////////////////////////////////////////////
 

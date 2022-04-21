@@ -81,17 +81,14 @@ public:
 			// Marble Texture Parameters
 			if (CollapsingHeader("Parameters")) {
 				SliderFloat("SSS", &state->k_sss, 0.0f, 1.0f);
-				Spacing();
-				SliderFloat("Schlick.x", &state->k_schlick.x, 0.0f, 1.0f);
-				SliderFloat("Schlick.y", &state->k_schlick.y, 0.0f, 1.0f);
-				SliderFloat("Schlick.z", &state->k_schlick.z, 0.0f, 1.0f);
+				SliderFloat("Schlick", &state->k_schlick, 0.0f, 1.0f);
 			}
 
 			Spacing();
 
 			// Rendering Options
 			std::vector<const char*> options = {
-				"Phong", "OrenNayar", "Subsurface Scattering", "Schlick",
+				"OrenNayar", "MarbleRendering", "Subsurface Scattering", "Schlick",
 				"Albedo", "Specular", "Depth Map",
 				 "Position", "Normal", "Depth", "Screen Space"};
 			static const char* current_item = options[state->render_mode];
