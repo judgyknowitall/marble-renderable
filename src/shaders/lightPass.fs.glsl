@@ -32,7 +32,7 @@ uniform vec3 ambient = vec3(0.1, 0.07, 0.03);   // Ambient Light
 
 uniform float near_plane = -5.f;
 uniform float far_plane = 10.f;
-uniform float sigma_t = 1.f;
+uniform float sigma_t = 0.3f;
 
 
 
@@ -154,16 +154,9 @@ void main()
         break;
 
     case 5:     // LightSpace Position
-        //FragColor = vec4(LightPos.xyz, 1.0);
-        float si = depth - sss_depth;
+        float si = FragPos.z - LightPos.z;
         FragColor = exp(-si * sigma_t) * bg;
         float s = FragColor.r;
-
-        if (s > 1) FragColor = vec4(1,0,0,1);           // red
-        else if (s < 0) FragColor = vec4(0,1,0,1);      // green
-        else if (s < -1) FragColor = vec4(0,0,1,1);     // blue
-        
-
         break;
 
     case 6:     // Position

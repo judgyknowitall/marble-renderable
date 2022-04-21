@@ -26,7 +26,11 @@ public:
 	int render_mode = 2;
 	bool show_panel = true;
 
+	// Colours
 	glm::vec4 background_colour = glm::vec4(0.2, 0.1, 0, 1);
+
+	// Parameters
+	float k_sss = 0.3f;
 
 	// Methods //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -43,8 +47,11 @@ public:
 	glm::mat4 getLightSpaceMatrix() {
 		using namespace glm;
 
-		mat4 lightProjection = ortho(-10.f, 10.f, -10.f, 10.f, -5.f, 10.f);
+		//mat4 lightProjection = ortho(-10.f, 10.f, -10.f, 10.f, -5.f, 10.f);
 		mat4 lightView = lookAt(getLightPos(), vec3(0.f), vec3(0.f, 1.f, 0.f));
+		mat4 lightProjection = perspective(45.0f, 1.f, 0.1f, 100.f);
+		//mat4 lightView = lookAt(vec3(VIEW_POS_X, VIEW_POS_Y, VIEW_POS_Z), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
+		
 
 		return lightProjection * lightView;
 	}

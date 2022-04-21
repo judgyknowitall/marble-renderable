@@ -68,15 +68,22 @@ public:
 				}
 			}
 
+			Spacing();
+
 			// Colours
 			if (CollapsingHeader("Colours")) {
 				//static float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-				ImGui::ColorEdit3("color", &state->background_colour.r);
+				ColorEdit3("color", &state->background_colour.r);
 			}
 
+			Spacing();
+
 			// Marble Texture Parameters
+			if (CollapsingHeader("Parameters")) {
+				SliderFloat("float", &state->k_sss, 0.0f, 1.0f);
+			}
 
-
+			Spacing();
 
 			// Rendering Options
 			std::vector<const char*> options = {

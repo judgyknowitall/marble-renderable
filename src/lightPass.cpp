@@ -44,6 +44,7 @@ void LightPass::render() {
     // Other Uniforms
     shader->setInt("render_mode", state->render_mode);
     shader->setVec4("bg", bg);
+    shader->setFloat("sigma_t", state->k_sss);
 
     // AttachTextures
     AttachTextures();
