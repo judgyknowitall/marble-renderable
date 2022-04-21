@@ -75,13 +75,9 @@ void DepthPass::render(unsigned int windowWidth, unsigned int windowHeight) {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	shader->use();
 	
-	// Orthographic Projection MAtrix
-	mat4 lightProjection = ortho(-10.f, 10.f, -10.f, 10.f, -5.f, 10.f);
-	shader->setMat4("lightProjection", lightProjection);
-
-	// View Matrix
-	mat4 lightView = lookAt(state->getLightPos(), vec3(0.f), vec3(0.f, 1.f, 0.f));
-	shader->setMat4("lightView", lightView);
+	// Proj * View Matrix
+	mat4 lightSpace = state->getLightSpaceMatrix();
+	shader->setMat4("lightSpaceMatrix", lightSpace);
 
 	// Object Transformation Matrix
 	mat4 model = obj->getTransformation();

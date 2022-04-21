@@ -2,6 +2,7 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
 
 // Constants to help with location bindings
 #define VERTEX_DATA 0
@@ -25,6 +26,8 @@ public:
 	int render_mode = 2;
 	bool show_panel = true;
 
+	glm::vec4 background_colour = glm::vec4(0.2, 0.1, 0, 1);
+
 	// Methods //////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	void rotate_light(const glm::vec3& axis, const float& amount) {
@@ -33,6 +36,16 @@ public:
 
 	glm::vec3 getLightPos() {
 		glm::vec3 L = glm::vec3(light_rotate * light);
-		return glm::normalize(L);
+		if (glm::length(L) != 0) L = glm::normalize(L);
+		return L;
+	}
+
+	glm::mat4 getLightSpaceMatrix() {
+		using namespace glm;
+
+		mat4 lightProjection = ortho(-10.f, 10.f, -10.f, 10.f, -5.f, 10.f);
+		mat4 lightView = lookAt(getLightPos(), vec3(0.f), vec3(0.f, 1.f, 0.f));
+
+		return lightProjection * lightView;
 	}
 };

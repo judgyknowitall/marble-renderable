@@ -16,7 +16,7 @@ using namespace std;
 
 
 // Constructor: create shaderprogram
-GeomPass::GeomPass(ObjFile* o, State* s) : obj(o) {
+GeomPass::GeomPass(ObjFile* o, State* s) : obj(o), state(s) {
 	
     // set up the draw buffers
     glGenFramebuffers(1, &gBuffer);
@@ -38,8 +38,8 @@ void GeomPass::generateTextures(unsigned int WindowWidth, unsigned int WindowHei
 
     // reserve some new ones
     texNames.clear();
-    texMaps.resize(4);
-    glGenTextures(4, texMaps.data());
+    texMaps.resize(5);
+    glGenTextures(5, texMaps.data());
 
     // create each of the textures
     // 0: depth -> depth, 32F
@@ -67,6 +67,13 @@ void GeomPass::generateTextures(unsigned int WindowWidth, unsigned int WindowHei
     texNames.push_back("gPosition");
     glBindTexture(GL_TEXTURE_2D, texMaps[3]);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, WindowWidth, WindowHeight, 0, GL_RGB, GL_FLOAT, nullptr);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    // 4: RGB -> LightSpace coords, 32F
+    texNames.push_back("gLightSpacePos");
+    glBindTexture(GL_TEXTURE_2D, texMaps[4]);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, WindowWidth, WindowHeight, 0, GL_RGBA, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
@@ -98,6 +105,10 @@ void GeomPass::render(int width, int height) {
     // Create and pass projection matrix
     mat4 proj = perspective(45.0f, (float)width / (float)height, 0.1f, 100.f);
     shader->setMat4("projection", proj);
+
+    // LightSpace Matrix (proj * view)
+    mat4 lightSpace = state->getLightSpaceMatrix();
+    shader->setMat4("lightSpace", lightSpace);
 
     // Marble Texture
     shader->setInt("marbleTexture", 0);

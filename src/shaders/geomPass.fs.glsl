@@ -5,7 +5,9 @@
 layout(location = 0) out vec4 gColor;
 layout(location = 1) out vec3 gNormal;
 layout(location = 2) out vec3 gPosition;
+layout(location = 3) out vec4 gLightSpacePos;
 
+in vec4 LightFragPos;
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoord;
@@ -13,9 +15,11 @@ in vec2 TexCoord;
 uniform sampler2D marbleTexture;
 
 
+
 void main()
 {
     // Store pos and normal to gBuffer
+    gLightSpacePos = LightFragPos;
     gPosition = FragPos;
     gNormal = normalize(Normal);
 

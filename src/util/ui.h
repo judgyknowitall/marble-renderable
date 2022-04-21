@@ -68,10 +68,20 @@ public:
 				}
 			}
 
+			// Colours
+			if (CollapsingHeader("Colours")) {
+				//static float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+				ImGui::ColorEdit3("color", &state->background_colour.r);
+			}
+
+			// Marble Texture Parameters
+
+
+
 			// Rendering Options
 			std::vector<const char*> options = {
 				"Phong", "OrenNayar", "Albedo", "Specular", "Depth Map",
-				"Position", "Normal", "Depth", "Screen Space"};
+				"LightSpacePos", "Position", "Normal", "Depth", "Screen Space"};
 			static const char* current_item = "Phong";
 			if (BeginCombo("Render Type", current_item)) // The second parameter is the label previewed before opening the combo.
 			{
@@ -89,10 +99,6 @@ public:
 				}
 				EndCombo();
 			}
-
-			// Material Options
-			// Marble Texture
-			
 
 			// Display FPS
 			Spacing();

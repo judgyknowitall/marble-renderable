@@ -46,6 +46,7 @@ int main(int argc, char **argv)
     UI ui(window->getWindow(), state);    // imgui
     
     // Create Rendering Passes
+    cout << "Setting up Each Pass..." << endl;
     DepthPass depthPass(obj, state);
     GeomPass geomPass(obj, state);
     LightPass lightPass(&geomPass.texMaps, &geomPass.texNames, depthPass.depthMapTex, state);
@@ -58,6 +59,7 @@ int main(int argc, char **argv)
     obj->setupObj();
   
     // MAIN LOOP
+    cout << "Running Render Loop..." << endl;
     if( geomPass.shaderGenerated() ) {
         while (!glfwWindowShouldClose(window->getWindow())){
 

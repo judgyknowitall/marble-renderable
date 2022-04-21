@@ -14,6 +14,7 @@ uniform sampler2D gDepth;
 uniform sampler2D gColor;
 uniform sampler2D gNormal;
 uniform sampler2D gPosition;
+uniform sampler2D gLightSpacePos;
 
 // Shadow Map
 uniform sampler2D depthMap;
@@ -31,6 +32,7 @@ uniform vec3 ambient = vec3(0.1, 0.07, 0.03);   // Ambient Light
 
 uniform float near_plane = -5.f;
 uniform float far_plane = 10.f;
+uniform float sigma_t = 1.f;
 
 
 
@@ -93,8 +95,11 @@ void orennayar(vec3 FragPos, vec3 Normal, vec3 Diffuse, float Specular) {
 // required when using a perspective projection matrix
 float linearizeDepth(float depth)
 {
-    float z = depth * 2.0 - 1.0; // Back to NDC 
-    return (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));	
+    //float z = depth * 2.0 - 1.0; // Back to NDC 
+    float z = depth;
+    float new_depth = (2.0 * near_plane * far_plane) / (far_plane + near_plane - z * (far_plane - near_plane));	
+    //return (new_depth + 1)/ 2;
+    return new_depth;
 }
 
 
@@ -114,12 +119,13 @@ void main()
     }
 
     // retrieve data from gbuffer
+    vec4 LightPos = texture(gLightSpacePos, TexCoords);
     vec3 FragPos = texture(gPosition, TexCoords).xyz;
     vec3 Normal = texture(gNormal, TexCoords).xyz;
     vec3 Diffuse = texture(gColor, TexCoords).rgb;
     float Specular = texture(gColor, TexCoords).a;
     float sss_depth = texture(depthMap, TexCoords).x;
-    sss_depth = linearizeDepth(sss_depth) / far_plane;
+    //sss_depth = linearizeDepth(sss_depth) / far_plane;
 
     // Render
     switch(render_mode) {
@@ -142,22 +148,38 @@ void main()
 
     case 4: // Depth Map
         FragColor = vec4(vec3(sss_depth), 1.0);
+        if (sss_depth > 1) FragColor = vec4(1,0,0,1);           // red
+        else if (sss_depth < 0) FragColor = vec4(0,1,0,1);      // green
+        else if (sss_depth < -1) FragColor = vec4(0,0,1,1);     // blue
         break;
 
-    case 5:  // Position
+    case 5:     // LightSpace Position
+        //FragColor = vec4(LightPos.xyz, 1.0);
+        float si = depth - sss_depth;
+        FragColor = exp(-si * sigma_t) * bg;
+        float s = FragColor.r;
+
+        if (s > 1) FragColor = vec4(1,0,0,1);           // red
+        else if (s < 0) FragColor = vec4(0,1,0,1);      // green
+        else if (s < -1) FragColor = vec4(0,0,1,1);     // blue
+        
+
+        break;
+
+    case 6:     // Position
         FragColor = vec4(FragPos, 1.0);
         break;
     
-    case 6:  // Normal
+    case 7:     // Normal
         FragColor = vec4(Normal, 1.0);
         break;
     
-    case 7:  // Depth
+    case 8:     // Depth
         float d2 = depth * depth;
         FragColor = vec4(d2 * d2, d2, depth, 1.0);
         break;
 
-    default: // screen space
+    default:    // screen space
         FragColor = vec4(TexCoords, 0.0, 1.0);		
     }
 }

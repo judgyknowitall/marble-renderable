@@ -29,7 +29,8 @@ LightPass::LightPass(vector<GLuint>* tMaps, vector<string>* tNames, GLuint depth
 
 void LightPass::render() {
 
-    glClearColor(0.2f, 0.f, 0.f, 1.f); //TODO: bg colour later
+    vec4 bg = state->background_colour;
+    glClearColor(bg.r, bg.g, bg.b, bg.a);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     shader->use();
 
@@ -40,8 +41,9 @@ void LightPass::render() {
     vec3 view = vec3(VIEW_POS_X, VIEW_POS_Y, VIEW_POS_Z);
     shader->setVec3("V", view);
 
-    // Render Mode
+    // Other Uniforms
     shader->setInt("render_mode", state->render_mode);
+    shader->setVec4("bg", bg);
 
     // AttachTextures
     AttachTextures();
