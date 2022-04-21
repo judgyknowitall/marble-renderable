@@ -80,16 +80,21 @@ public:
 
 			// Marble Texture Parameters
 			if (CollapsingHeader("Parameters")) {
-				SliderFloat("float", &state->k_sss, 0.0f, 1.0f);
+				SliderFloat("SSS", &state->k_sss, 0.0f, 1.0f);
+				Spacing();
+				SliderFloat("Schlick.x", &state->k_schlick.x, 0.0f, 1.0f);
+				SliderFloat("Schlick.y", &state->k_schlick.y, 0.0f, 1.0f);
+				SliderFloat("Schlick.z", &state->k_schlick.z, 0.0f, 1.0f);
 			}
 
 			Spacing();
 
 			// Rendering Options
 			std::vector<const char*> options = {
-				"Phong", "OrenNayar", "Albedo", "Specular", "Depth Map",
-				"LightSpacePos", "Position", "Normal", "Depth", "Screen Space"};
-			static const char* current_item = "Phong";
+				"Phong", "OrenNayar", "Subsurface Scattering", "Schlick",
+				"Albedo", "Specular", "Depth Map",
+				 "Position", "Normal", "Depth", "Screen Space"};
+			static const char* current_item = options[state->render_mode];
 			if (BeginCombo("Render Type", current_item)) // The second parameter is the label previewed before opening the combo.
 			{
 				for (int i = 0; i < options.size(); i++)

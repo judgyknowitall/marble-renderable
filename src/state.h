@@ -23,7 +23,7 @@ private:
 
 public:
 
-	int render_mode = 2;
+	int render_mode = 3;
 	bool show_panel = true;
 
 	// Colours
@@ -31,6 +31,7 @@ public:
 
 	// Parameters
 	float k_sss = 0.3f;
+	glm::vec3 k_schlick = glm::vec3(0.04);
 
 	// Methods //////////////////////////////////////////////////////////////////////////////////////////////////////////
 

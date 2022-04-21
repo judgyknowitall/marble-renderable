@@ -341,8 +341,8 @@ vec3 ObjFile::getNormal (int i) {
 }
 
 mat4 ObjFile::getFitScale () {
-	float radius = length (max - min);
-	return scale (mat4 (1.0f), vec3 (0.95f * radius));
+	float radius = length (max - min) * 0.5;
+	return scale (mat4 (1.0f), vec3 (0.95f / radius));
 }
 
 mat4 ObjFile::getFitTranslate () {

@@ -24,15 +24,17 @@ void main()
     gNormal = normalize(Normal);
 
     float marble_c = texture(marbleTexture, TexCoord).r;
-    gColor.rgb = vec3(marble_c);
-    //vec4 color = vec4(.88f, 0.775, 0.61, 1.f);
-    //gColor = 1 - (1-gColor.r) * (1-color);
+    //gColor.rgb = vec3(marble_c);
+
+    vec4 color = vec4(.88f, 0.775, 0.61, 1.f);
+    gColor = 1 - (1-marble_c) * (1-color);      // Adjust Transparency
     // Create Marble Color from generated texture
     //vec4 stripes = vec4(236/256, 202/256, 164/256, 1.f);
     vec4 stripes = vec4(.1, .1, .1, 1);
     
-    //if (gColor.x < 0.99) gColor += stripes / (gColor.x+0.01);
     //gColor += color;
+    //gColor = 1 - (1-gColor) * (1-color);
+
     //gColor *= vec4(0.98, 0.977, 0.926,1.f);
     gColor.a = 0;
     

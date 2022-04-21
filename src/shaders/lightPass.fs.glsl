@@ -34,6 +34,7 @@ uniform float near_plane = -5.f;
 uniform float far_plane = 10.f;
 uniform float sigma_t = 0.3f;
 
+uniform vec3 k_schlick = vec3(0.04);
 
 
 /////////////////////////////////////////////////////////////////////
@@ -104,6 +105,21 @@ float linearizeDepth(float depth)
 
 
 /////////////////////////////////////////////////////////////////////
+// Fresnel Schlick Reflection Approximation
+/////////////////////////////////////////////////////////////////////
+
+
+vec3 fresnelSchlick(vec3 Normal, vec3 Diffuse)
+{
+    //vec3 F0 = k_schlick * Diffuse;
+    //float cosTheta = max(dot(Normal, V), 0);
+    //return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    float NdotL = max( 0, dot( Normal, L ) );
+    return Diffuse + ( 1 - Diffuse ) * pow( ( 1 - NdotL ), 5 );
+}
+
+
+/////////////////////////////////////////////////////////////////////
 // MAIN
 /////////////////////////////////////////////////////////////////////
 
@@ -127,47 +143,54 @@ void main()
     float sss_depth = texture(depthMap, TexCoords).x;
     //sss_depth = linearizeDepth(sss_depth) / far_plane;
 
+    // SSS values
+    float si = FragPos.z - LightPos.z;
+    float sss_value = exp(-si * sigma_t);
+    //Diffuse = vec3(1.0,0,0);
+
     // Render
     switch(render_mode) {
     
     case 0: // Phong
         phong(FragPos, Normal, Diffuse, Specular);
+        FragColor = sss_value * FragColor;
         break;
 
     case 1: // Oren-Nayar
         orennayar(FragPos, Normal, Diffuse, Specular);
+        FragColor = sss_value * FragColor;
         break;
 
-    case 2: // Albedo
+    case 2:     // Subsurface Scattering
+        FragColor = vec4(sss_value * Diffuse, 1.0);
+        break;
+
+    case 3:     // Reflection
+        Diffuse = vec3(.1f, 0.1, 0.1);
+        FragColor = vec4(fresnelSchlick(Normal, Diffuse),1.0);
+        break;
+
+    case 4: // Albedo
         FragColor = vec4( Diffuse, 1.0 );
         break;
 
-    case 3: // Specular
+    case 5: // Specular
         FragColor = vec4(Specular, Specular, Specular, 1.0);
         break;
 
-    case 4: // Depth Map
+    case 6: // Depth Map
         FragColor = vec4(vec3(sss_depth), 1.0);
-        if (sss_depth > 1) FragColor = vec4(1,0,0,1);           // red
-        else if (sss_depth < 0) FragColor = vec4(0,1,0,1);      // green
-        else if (sss_depth < -1) FragColor = vec4(0,0,1,1);     // blue
         break;
 
-    case 5:     // LightSpace Position
-        float si = FragPos.z - LightPos.z;
-        FragColor = exp(-si * sigma_t) * bg;
-        float s = FragColor.r;
-        break;
-
-    case 6:     // Position
+    case 7:     // Position
         FragColor = vec4(FragPos, 1.0);
         break;
     
-    case 7:     // Normal
+    case 8:     // Normal
         FragColor = vec4(Normal, 1.0);
         break;
     
-    case 8:     // Depth
+    case 9:     // Depth
         float d2 = depth * depth;
         FragColor = vec4(d2 * d2, d2, depth, 1.0);
         break;
