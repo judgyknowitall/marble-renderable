@@ -19,7 +19,6 @@ private:
 
 	// allow the light to be rotated
 	glm::vec4 light = glm::vec4(0.7071067811865475, 0, 0.7071067811865475, 1);
-		//glm::vec4(1.f,1.f,1.f,1.f);
 	glm::mat4 light_rotate = glm::mat4(1.0);
 
 public:
@@ -48,18 +47,14 @@ public:
 
 	glm::vec3 getLightPos() {
 		glm::vec3 L = glm::vec3(light_rotate * light);
-		//if (glm::length(L) != 0) L = glm::normalize(L);
 		return L;
 	}
 
 	glm::mat4 getLightSpaceMatrix() {
 		using namespace glm;
 
-		//mat4 lightProjection = ortho(-10.f, 10.f, -10.f, 10.f, -5.f, 10.f);
 		mat4 lightView = lookAt(getLightPos(), vec3(0.f), vec3(0.f, 1.f, 0.f));
-		mat4 lightProjection = perspective(45.0f, 1.f, 0.1f, 100.f);
-		//mat4 lightView = lookAt(vec3(VIEW_POS_X, VIEW_POS_Y, VIEW_POS_Z), vec3(0.0f), vec3(0.0f, 1.0f, 0.0f));
-		
+		mat4 lightProjection = perspective(45.0f, 1.f, 0.1f, 100.f);		
 
 		return lightProjection * lightView;
 	}

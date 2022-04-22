@@ -199,7 +199,6 @@ float MarbleTexture(float x, float y) {
 	float turbSize = 32.0; //initial size of the turbulence
 
 	float xyValue = x * xPeriod / noiseWidth + y * yPeriod / noiseHeight + turbPower * turbulence(x, y, turbSize) / 256.0;
-	//float xyValue = x * xPeriod / noiseWidth + y * yPeriod / noiseHeight;
 	float c = abs(sin(xyValue * 3.14159));
 
 	return c;
@@ -217,7 +216,6 @@ void ObjFile::calculateColors() {
 	for (float s = 0; s < MARBLE_TEX_WIDTH; s++) {
 		for (float t = 0; t < MARBLE_TEX_HEIGHT; t++) {
 			float c = MarbleTexture(s,t);	// Basic sine function
-			//cout << c << endl;
 			marbleNoise.push_back(c);
 		}
 	}
@@ -225,7 +223,6 @@ void ObjFile::calculateColors() {
 	// Texture Mapping
 	for (auto vertex : vertices) {
 		textureCoords.push_back(vec2(vertex.x, vertex.z));
-		//cout << vertex.x << ',' << vertex.y << ',' << vertex.z << endl;
 	}
 }
 

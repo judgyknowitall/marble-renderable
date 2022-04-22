@@ -175,7 +175,7 @@ void main()
         break;
 
     case 6:     // Shadow Map
-        FragColor = vec4(vec3(LightPos.z), 1.0);
+        FragColor = vec4(vec3(sss_depth), 1.0);
         break;
 
     case 7:     // Depth
